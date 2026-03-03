@@ -1,0 +1,11 @@
+This is a placeholder file.
+
+Replace this file with your actual résumé PDF.
+
+File name: gabriel-aguilar-creative-tech.pdf
+Path: assets/pdfs/gabriel-aguilar-creative-tech.pdf
+
+Once you have your PDF ready:
+1. Delete this .txt file
+2. Drop your PDF into this folder with the exact same filename
+3. The "CREATIVE TECHNOLOGY" cluster center word will link to it automatically

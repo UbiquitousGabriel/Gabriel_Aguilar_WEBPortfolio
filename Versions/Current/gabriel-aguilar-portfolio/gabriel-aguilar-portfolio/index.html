@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gabriel Aguilar</title>
+<style>
+
+/* ============================================================
+   RESET & BASE
+   All elements inherit box-sizing. Font is Times New Roman
+   throughout for the editorial feel.
+============================================================ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html, body {
+  width: 100%;
+  min-height: 100%;
+  background: #ffffff;
+  color: #000000;
+  font-family: "Times New Roman", Times, serif;
+  overflow-x: hidden;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ============================================================
+   NAVIGATION BAR
+   Fixed to top. Three buttons: Home, Work, Portfolio.
+   Active button gets an underline. Others are faded.
+============================================================ */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 52px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+.navbar-logo {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  cursor: pointer;
+  user-select: none;
+}
+.navbar-links {
+  display: flex;
+  gap: 36px;
+}
+.navbar-button {
+  background: none;
+  border: none;
+  border-bottom: 1px solid transparent;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: #000;
+  padding: 3px 0;
+  opacity: 0.35;
+  transition: opacity 0.25s, border-color 0.25s;
+}
+.navbar-button.is-active {
+  opacity: 1;
+  border-bottom: 1px solid #000;
+}
+
+/* ============================================================
+   PAGE SYSTEM
+   Only one .page is visible at a time.
+   .page elements are completely hidden (display:none) unless
+   they have the .is-visible class added by JavaScript.
+   This guarantees no bleed-through between pages.
+============================================================ */
+.page {
+  display: none;                  /* hidden by default */
+  position: relative;
+  min-height: calc(100vh - 60px);
+  margin-top: 60px;               /* offset for fixed navbar */
+}
+.page.is-visible {
+  display: block;                 /* shown only when active */
+}
+
+/* ============================================================
+   GENERATIVE BACKGROUND CANVAS
+   Sits behind everything on Home and Portfolio.
+   Completely hidden on Work page (toggled via JS).
+============================================================ */
+.background-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.4s;
+}
+
+/* ============================================================
+   HOME PAGE
+   Two-column layout: photo on left, bio + contact on right.
+   Animated rule line and discipline tags at bottom.
+============================================================ */
+.home-page {
+  position: relative;
+  z-index: 1;
+  padding: 60px 52px 80px;
+  max-width: 920px;
+  margin: 0 auto;
+}
+.home-layout {
+  display: grid;
+  grid-template-columns: 185px 1fr;
+  gap: 60px;
+  margin-bottom: 52px;
+  align-items: start;
+}
+
+/* --- Photo placeholder --- */
+.home-photo-box {
+  width: 175px;
+  height: 235px;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.016);
+}
+.home-photo-box span {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  opacity: 0.22;
+}
+.home-photo-caption {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  opacity: 0.38;
+  margin-top: 9px;
+}
+
+/* --- Bio text block --- */
+.home-bio-column {
+  padding-top: 4px;
+}
+.home-bio-text {
+  font-size: 16.5px;
+  line-height: 1.92;
+  margin: 0 0 42px;
+  max-width: 500px;
+  letter-spacing: 0.01em;
+}
+
+/* --- Contact block --- */
+.home-contact-label {
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  opacity: 0.34;
+  margin: 0 0 8px;
+}
+.home-contact-link {
+  display: block;
+  font-size: 13px;
+  opacity: 0.7;
+  margin-bottom: 5px;
+  letter-spacing: 0.04em;
+}
+
+/* --- Animated horizontal rule --- */
+.home-divider-line {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.home-divider-line.is-revealed {
+  transform: scaleX(1);
+}
+
+/* --- Discipline tags row --- */
+.home-discipline-tags {
+  display: flex;
+  gap: 28px;
+}
+.home-discipline-tags span {
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  opacity: 0.3;
+}
+
+/* ============================================================
+   WORK PAGE
+   Centered flex column. Contains:
+   - Navigation arrows + counter
+   - SVG word cluster viewport (one cluster visible at a time)
+   - Dot indicators
+   - Skill detail panel (slides up from bottom on hover)
+============================================================ */
+.work-page {
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 20px 0;
+  /* Extra bottom padding to make room for the skill panel */
+  padding-bottom: 280px;
+}
+
+/* --- Cluster prev/next navigation --- */
+.cluster-navigation {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-bottom: 8px;
+}
+.cluster-arrow-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #000;
+  opacity: 0.38;
+  padding: 4px 14px;
+  transition: opacity 0.2s;
+}
+.cluster-arrow-button:hover {
+  opacity: 0.9;
+}
+.cluster-page-counter {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  opacity: 0.3;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* --- SVG cluster viewport ---
+   position:relative + overflow:hidden so clusters slide in/out cleanly */
+.cluster-viewport {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  height: 560px;
+  overflow: hidden;
+}
+
+/* --- Individual cluster slide ---
+   Each cluster is absolutely positioned inside the viewport.
+   JS adds .is-active, .is-exiting-left, .is-exiting-right to animate. */
+.cluster-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateX(80px);
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.cluster-slide.is-active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: all;
+}
+.cluster-slide.is-exiting-left {
+  opacity: 0;
+  transform: translateX(-80px);
+  pointer-events: none;
+}
+.cluster-slide.is-exiting-right {
+  opacity: 0;
+  transform: translateX(80px);
+  pointer-events: none;
+}
+.cluster-slide svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+
+/* --- Dot indicator row --- */
+.cluster-dot-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.cluster-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid #000;
+  background: transparent;
+  padding: 0;
+  transition: background 0.3s;
+}
+.cluster-dot.is-active {
+  background: #000;
+}
+.cluster-hint-text {
+  font-size: 8.5px;
+  letter-spacing: 0.18em;
+  opacity: 0.24;
+  margin-top: 12px;
+}
+
+/* ============================================================
+   SKILL DETAIL PANEL
+   Sticky to the bottom of the Work page ONLY.
+   Lives inside .work-page so it cannot appear on other pages.
+   Slides up when a skill word is hovered.
+============================================================ */
+.skill-detail-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 500;
+  background: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 24px 52px 28px;
+  /* Start hidden below the screen */
+  transform: translateY(100%);
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  max-height: 38vh;
+  overflow-y: auto;
+  /* Only show when work page is active - controlled by JS class on body */
+}
+.skill-detail-panel.is-open {
+  transform: translateY(0);
+  pointer-events: all;
+}
+/* Hide panel entirely when not on work page */
+.skill-detail-panel.is-hidden {
+  display: none;
+}
+
+.skill-panel-layout {
+  max-width: 860px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+.skill-panel-name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.skill-panel-summary {
+  font-size: 12px;
+  line-height: 1.7;
+  opacity: 0.55;
+  font-style: italic;
+}
+.skill-panel-bullet-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 32px;
+}
+.skill-panel-bullet-list li {
+  font-size: 12px;
+  line-height: 1.68;
+  opacity: 0.72;
+  padding-left: 16px;
+  position: relative;
+}
+.skill-panel-bullet-list li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  font-size: 10px;
+  opacity: 0.4;
+}
+.skill-panel-close-button {
+  position: absolute;
+  top: 14px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 13px;
+  opacity: 0.3;
+  color: #000;
+  transition: opacity 0.2s;
+}
+.skill-panel-close-button:hover {
+  opacity: 0.8;
+}
+
+/* ============================================================
+   PORTFOLIO PAGE
+   3-column grid of project tiles.
+   Each tile: thumbnail + resting label strip.
+   On hover: thumbnail grows, info panel expands below it,
+   strip fades out.
+   "View Images" button opens lightbox.
+============================================================ */
+.portfolio-page {
+  position: relative;
+  z-index: 1;
+  padding: 44px 48px 100px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.portfolio-section-label {
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  opacity: 0.32;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
+
+/* --- Project tile grid --- */
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  align-items: start; /* tiles expand independently, don't stretch each other */
+}
+
+/* --- Individual project tile --- */
+.project-tile {
+  position: relative;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  /* Start invisible for staggered reveal animation */
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.25s,
+              box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 1;
+}
+.project-tile.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+.project-tile:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.09);
+  z-index: 10;
+}
+
+/* --- Thumbnail wrapper (overflow:hidden clips the image only) --- */
+.project-thumbnail-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+.project-thumbnail {
+  position: relative;
+  width: 100%;
+  padding-top: 72%;       /* aspect ratio: 72% = ~4:3 ish */
+  background: #ececec;
+  transition: padding-top 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.project-tile:hover .project-thumbnail {
+  padding-top: 86%;       /* grows on hover to show more image */
+}
+/* SVG placeholder fills the thumbnail absolutely */
+.project-thumbnail svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* --- Resting label strip (visible when not hovered) --- */
+.project-resting-strip {
+  padding: 13px 18px 15px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  max-height: 80px;
+  transition: max-height 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.25s,
+              padding 0.3s;
+}
+.project-tile:hover .project-resting-strip {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.resting-strip-category {
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  opacity: 0.3;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.resting-strip-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* --- Expanded info panel (hidden at rest, revealed on hover) --- */
+.project-info-panel {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  border-top: 1px solid transparent;
+  transition: max-height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.35s,
+              border-color 0.3s;
+}
+.project-tile:hover .project-info-panel {
+  max-height: 300px;
+  opacity: 1;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+.project-info-inner {
+  padding: 16px 20px 20px;
+}
+.project-info-category {
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  opacity: 0.32;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.project-info-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin-bottom: 9px;
+}
+.project-info-description {
+  font-size: 11.5px;
+  line-height: 1.72;
+  opacity: 0.58;
+  margin-bottom: 16px;
+}
+
+/* --- View Images button inside tile --- */
+.project-view-button {
+  display: inline-block;
+  background: none;
+  border: 1px solid rgba(0, 0, 0, 0.28);
+  font-family: "Times New Roman", Times, serif;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: #000;
+  padding: 7px 16px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  cursor: pointer;
+}
+.project-view-button:hover {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+/* ============================================================
+   IMAGE LIGHTBOX
+   Full-screen overlay. Opens when "View Images" is clicked.
+   Shows a grid of placeholder image slots.
+   Close by clicking overlay, pressing Escape, or the X button.
+============================================================ */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s;
+}
+.lightbox-overlay.is-open {
+  opacity: 1;
+  pointer-events: all;
+}
+.lightbox-box {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  max-width: 840px;
+  width: 100%;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.97) translateY(14px);
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lightbox-overlay.is-open .lightbox-box {
+  transform: scale(1) translateY(0);
+}
+.lightbox-close-button {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  opacity: 0.3;
+  color: #000;
+  z-index: 10;
+  transition: opacity 0.2s;
+}
+.lightbox-close-button:hover {
+  opacity: 0.8;
+}
+.lightbox-header {
+  padding: 36px 40px 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+.lightbox-category {
+  font-size: 8px;
+  letter-spacing: 0.24em;
+  opacity: 0.3;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.lightbox-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 10px;
+}
+.lightbox-description {
+  font-size: 14px;
+  line-height: 1.84;
+  opacity: 0.68;
+}
+/* Grid of placeholder images inside lightbox */
+.lightbox-image-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 3px;
+}
+.lightbox-image-slot {
+  padding-top: 66%;
+  position: relative;
+  background: #ececec;
+}
+.lightbox-image-slot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.lightbox-footer-note {
+  padding: 24px 40px 32px;
+  font-size: 11px;
+  opacity: 0.32;
+  line-height: 1.76;
+  font-style: italic;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+/* ============================================================
+   RESPONSIVE
+   Adjust columns and padding for smaller screens.
+============================================================ */
+@media (max-width: 900px) {
+  .project-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .navbar { padding: 0 24px; }
+  .home-page { padding: 50px 24px 60px; }
+  .home-layout { grid-template-columns: 1fr; gap: 28px; }
+  .portfolio-page { padding: 40px 20px 80px; }
+  .project-grid { grid-template-columns: 1fr; }
+  .work-page { padding: 40px 12px 260px; }
+  .cluster-viewport { height: 480px; }
+  .skill-detail-panel { padding: 20px 24px 24px; }
+  .skill-panel-layout { grid-template-columns: 1fr; gap: 16px; }
+  .skill-panel-bullet-list { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     GENERATIVE BACKGROUND CANVAS
+     Animated bezier curves drawn here. Hidden on Work page.
+============================================================ -->
+<canvas class="background-canvas" id="background-canvas"></canvas>
+
+<!-- ============================================================
+     NAVIGATION BAR
+     Logo on left, page buttons on right.
+     Each button calls showPage() with its page name.
+============================================================ -->
+<nav class="navbar">
+  <span class="navbar-logo" onclick="showPage('home')">G. AGUILAR</span>
+  <div class="navbar-links">
+    <button class="navbar-button is-active" id="nav-home"      onclick="showPage('home')">HOME</button>
+    <button class="navbar-button"           id="nav-work"      onclick="showPage('work')">WORK</button>
+    <button class="navbar-button"           id="nav-portfolio" onclick="showPage('portfolio')">PORTFOLIO</button>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HOME PAGE
+     Shown by default on load. Hidden when another page is active.
+============================================================ -->
+<div class="page is-visible" id="page-home">
+  <div class="home-page">
+
+    <div class="home-layout">
+      <!-- Left: Photo placeholder -->
+      <!-- TO CUSTOMIZE: Replace the .home-photo-box div with an <img> tag -->
+      <div>
+        <div class="home-photo-box"><span>PHOTO</span></div>
+        <p class="home-photo-caption">Gabriel Aguilar</p>
+      </div>
+
+      <!-- Right: Bio and contact info -->
+      <div class="home-bio-column">
+        <!-- TO CUSTOMIZE: Edit this paragraph with your bio text -->
+        <p class="home-bio-text">
+          Gabriel Aguilar is a highly motivated art worker with a diverse skill set in video,
+          live event production, and emergent media technology. Seeking to contribute to
+          innovative projects in a creative technology role.
+        </p>
+
+        <p class="home-contact-label">CONTACT</p>
+        <!-- TO CUSTOMIZE: Update phone and email below -->
+        <a class="home-contact-link" href="tel:7174228560">(717) 422-8560</a>
+        <a class="home-contact-link" href="/cdn-cgi/l/email-protection#c4a3a5a5a3b1ada8a5b6a2ada8a984a3a9a5ada8eaa7aba9"><span class="__cf_email__" data-cfemail="4720262620322e2b2635212e2b2a07202a262e2b6924282a">[email&#160;protected]</span></a>
+      </div>
+    </div>
+
+    <!-- Animated divider line - triggered by JS on page load -->
+    <div class="home-divider-line" id="home-divider-line"></div>
+
+    <!-- Discipline label tags -->
+    <!-- TO CUSTOMIZE: Add or remove discipline tags here -->
+    <div class="home-discipline-tags">
+      <span>Film</span>
+      <span>Theater</span>
+      <span>Creative Technology</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     WORK PAGE
+     Hidden until "WORK" nav button is clicked.
+     Contains the word cluster visualization and skill panel.
+============================================================ -->
+<div class="page" id="page-work">
+  <div class="work-page">
+
+    <!-- Prev / counter / next navigation -->
+    <div class="cluster-navigation">
+      <button class="cluster-arrow-button" onclick="navigateCluster(-1)">&#8592;</button>
+      <span class="cluster-page-counter" id="cluster-page-counter">01 / 03</span>
+      <button class="cluster-arrow-button" onclick="navigateCluster(1)">&#8594;</button>
+    </div>
+
+    <!-- SVG cluster slides are injected here by buildWorkPage() -->
+    <div class="cluster-viewport" id="cluster-viewport"></div>
+
+    <!-- Dot indicators are injected here by buildWorkPage() -->
+    <div class="cluster-dot-row" id="cluster-dot-row"></div>
+
+    <p class="cluster-hint-text">Hover a skill for details &middot; Click the main word to view r&eacute;sum&eacute;</p>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     PORTFOLIO PAGE
+     Hidden until "PORTFOLIO" nav button is clicked.
+     Project tiles are injected here by buildPortfolioPage().
+============================================================ -->
+<div class="page" id="page-portfolio">
+  <div class="portfolio-page">
+    <p class="portfolio-section-label">Selected Work</p>
+    <!-- Project tiles injected here by buildPortfolioPage() -->
+    <div class="project-grid" id="project-grid"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SKILL DETAIL PANEL
+     Fixed to bottom of screen. ONLY shown when Work page is active.
+     Controlled entirely by showPage() toggling .is-hidden.
+     Slides up when a skill word is hovered.
+============================================================ -->
+<div class="skill-detail-panel is-hidden" id="skill-detail-panel">
+  <button class="skill-panel-close-button" onclick="closeSkillPanel()">&#10005;</button>
+  <div class="skill-panel-layout">
+    <div>
+      <p class="skill-panel-name"    id="skill-panel-name"></p>
+      <p class="skill-panel-summary" id="skill-panel-summary"></p>
+    </div>
+    <ul class="skill-panel-bullet-list" id="skill-panel-bullets"></ul>
+  </div>
+</div>
+
+<!-- ============================================================
+     IMAGE LIGHTBOX
+     Full-screen overlay for project image galleries.
+     Always in DOM but invisible until openLightbox() is called.
+============================================================ -->
+<div class="lightbox-overlay" id="lightbox-overlay" onclick="closeLightbox()">
+  <div class="lightbox-box" onclick="event.stopPropagation()">
+    <button class="lightbox-close-button" onclick="closeLightbox()">&#10005;</button>
+    <div class="lightbox-header">
+      <p class="lightbox-category"    id="lightbox-category"></p>
+      <h2 class="lightbox-title"      id="lightbox-title"></h2>
+      <p class="lightbox-description" id="lightbox-description"></p>
+    </div>
+    <!-- Image slots injected here by openLightbox() -->
+    <div class="lightbox-image-grid" id="lightbox-image-grid"></div>
+    <p class="lightbox-footer-note">
+      Additional images, video documentation, and project notes will appear here once content is added.
+    </p>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+/* ============================================================
+   LOREM IPSUM PLACEHOLDER TEXT
+   Used to fill bullet points and descriptions until you have
+   real content to put in. Replace these strings with your
+   actual experience and project descriptions.
+============================================================ */
+const LOREM_BULLETS = [
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+  "Ut labore et dolore magna aliqua, ut enim ad minim veniam quis nostrud.",
+  "Exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+  "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.",
+  "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.",
+  "Deserunt mollit anim id est laborum et dolore magna aliqua consequat.",
+];
+
+/* Returns the first N lorem bullet strings */
+function getLoremBullets(numberOfBullets) {
+  return LOREM_BULLETS.slice(0, numberOfBullets);
+}
+
+/* ============================================================
+   SKILL / CLUSTER DATA
+   TO CUSTOMIZE:
+   - Change 'label' to update the center word
+   - Change 'resumeFile' to point to your actual PDF file
+   - Change 'words' array to update skill words in the cluster
+   - For each word: 't' = display text, 'summary' = tooltip/panel
+     summary, 'bullets' = experience bullet points
+============================================================ */
+const ALL_CLUSTERS = [
+  {
+    label: "FILM",
+    labelFontSize: 28,
+    resumeFile: "/pdfs/gabriel-aguilar-film.pdf",  /* <-- update this path */
+    words: [
+      { t: "Video Editing",    summary: "Post-production editing for narrative and commercial projects.",   bullets: getLoremBullets(4) },
+      { t: "Post Supervision", summary: "Overseeing the full post-production pipeline.",                    bullets: getLoremBullets(4) },
+      { t: "Digital Imaging",  summary: "DIT work and on-set color management.",                           bullets: getLoremBullets(3) },
+      { t: "Directing",        summary: "Short-form narrative and documentary direction.",                  bullets: getLoremBullets(5) },
+      { t: "Asst. Camera",     summary: "Focus pulling and camera department support.",                     bullets: getLoremBullets(4) },
+      { t: "Best Boy Grip",    summary: "Lighting grip and rigging coordination.",                          bullets: getLoremBullets(3) },
+      { t: "Electric",         summary: "On-set electrical and lighting setup.",                            bullets: getLoremBullets(3) },
+      { t: "Asst. Director",   summary: "Scheduling, logistics, and set management.",                       bullets: getLoremBullets(4) },
+      { t: "Set Design",       summary: "Designing and dressing production environments.",                  bullets: getLoremBullets(3) },
+      { t: "DSLR Photography", summary: "Still photography with DSLR and mirrorless systems.",             bullets: getLoremBullets(4) },
+      { t: "After Effects",    summary: "Motion graphics, compositing, and VFX.",                          bullets: getLoremBullets(5) },
+      { t: "Premiere Pro",     summary: "Non-linear editing in Adobe Premiere Pro.",                        bullets: getLoremBullets(4) },
+      { t: "DaVinci Resolve",  summary: "Color grading and finishing in DaVinci Resolve.",                 bullets: getLoremBullets(4) },
+      { t: "Color Correction", summary: "Primary and secondary color correction workflows.",               bullets: getLoremBullets(3) },
+      { t: "Voice Over",       summary: "Direction and production of voice-over sessions.",                bullets: getLoremBullets(3) },
+    ]
+  },
+  {
+    label: "THEATER",
+    labelFontSize: 26,
+    resumeFile: "/pdfs/gabriel-aguilar-theater.pdf", /* <-- update this path */
+    words: [
+      { t: "Writing",             summary: "Original playwriting and script development.",                  bullets: getLoremBullets(4) },
+      { t: "Directing",           summary: "Stage direction for drama, comedy, and devised work.",          bullets: getLoremBullets(5) },
+      { t: "Acting",              summary: "Performance in theatrical and experimental productions.",        bullets: getLoremBullets(4) },
+      { t: "Stage Design",        summary: "Scenic design and spatial storytelling.",                       bullets: getLoremBullets(4) },
+      { t: "Lighting Design",     summary: "Theatrical lighting plots and cue programming.",                bullets: getLoremBullets(5) },
+      { t: "Stage Management",    summary: "Production coordination and rehearsal management.",             bullets: getLoremBullets(4) },
+      { t: "Board Operation",     summary: "Live operation of lighting and sound consoles.",               bullets: getLoremBullets(3) },
+      { t: "Video Engineering",   summary: "Live video systems in theatrical contexts.",                    bullets: getLoremBullets(3) },
+      { t: "Electrics",           summary: "Theatrical electrical rigging and fixture maintenance.",        bullets: getLoremBullets(3) },
+      { t: "Technical Directing", summary: "Overseeing technical elements across departments.",             bullets: getLoremBullets(4) },
+      { t: "Carpentry",           summary: "Scenic carpentry and construction.",                            bullets: getLoremBullets(3) },
+      { t: "Networking",          summary: "Technical networking for live production systems.",             bullets: getLoremBullets(3) },
+    ]
+  },
+  {
+    label: "CREATIVE TECHNOLOGY",
+    labelFontSize: 17,
+    resumeFile: "/pdfs/gabriel-aguilar-creative-tech.pdf", /* <-- update this path */
+    words: [
+      { t: "Projection Mapping", summary: "Real-time projection onto 3D surfaces.",                        bullets: getLoremBullets(5) },
+      { t: "Unity",              summary: "Real-time 3D development and interactive experiences.",          bullets: getLoremBullets(4) },
+      { t: "Unreal Engine",      summary: "Virtual production and high-fidelity rendering.",               bullets: getLoremBullets(4) },
+      { t: "Fabrication",        summary: "Physical prototyping and mixed-media construction.",            bullets: getLoremBullets(4) },
+      { t: "Robotics",           summary: "Programmable motion systems and kinetic installations.",        bullets: getLoremBullets(3) },
+      { t: "3D Printing",        summary: "FDM and resin printing for props and prototypes.",              bullets: getLoremBullets(3) },
+      { t: "CNC",                summary: "Computer-controlled milling and cutting.",                      bullets: getLoremBullets(3) },
+      { t: "LiDAR",              summary: "Spatial scanning and point-cloud capture.",                     bullets: getLoremBullets(4) },
+      { t: "Object Tracking",    summary: "Computer vision and real-time object recognition.",             bullets: getLoremBullets(4) },
+      { t: "HTML / CSS",         summary: "Front-end web development and interactive interfaces.",         bullets: getLoremBullets(4) },
+      { t: "Python",             summary: "Scripting, automation, and data-driven installations.",         bullets: getLoremBullets(5) },
+      { t: "JavaScript",         summary: "Interactive web experiences and creative coding.",              bullets: getLoremBullets(4) },
+    ]
+  }
+];
+
+/* ============================================================
+   PORTFOLIO PROJECT DATA
+   TO CUSTOMIZE:
+   - 'title': Project name shown on the tile and in lightbox
+   - 'category': Film / Theater / Creative Technology
+   - 'description': Short paragraph about the project
+   - 'imageCount': How many placeholder image slots to show in lightbox
+   Replace lorem ipsum with real descriptions when ready.
+============================================================ */
+const ALL_PROJECTS = [
+  {
+    title: "Untitled Installation 01",
+    category: "Creative Technology",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim.",
+    imageCount: 3
+  },
+  {
+    title: "Short Film: Meridian",
+    category: "Film",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut labore et dolore magna aliqua, ut enim ad minim veniam quis nostrud exercitation.",
+    imageCount: 4
+  },
+  {
+    title: "Stage Design: The Room",
+    category: "Theater",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute.",
+    imageCount: 2
+  },
+  {
+    title: "Point Cloud Portrait Series",
+    category: "Creative Technology",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.",
+    imageCount: 5
+  },
+  {
+    title: "Documentary: Hands",
+    category: "Film",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt.",
+    imageCount: 3
+  },
+  {
+    title: "Kinetic Typography: Live",
+    category: "Creative Technology",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Deserunt mollit anim id est laborum. Ut enim ad minim veniam quis nostrud.",
+    imageCount: 4
+  },
+  {
+    title: "Live Event: Symposium",
+    category: "Theater",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium.",
+    imageCount: 2
+  },
+  {
+    title: "VFX Sequence: Drift",
+    category: "Film",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.",
+    imageCount: 3
+  },
+  {
+    title: "Robotic Sculpture: Pulse",
+    category: "Creative Technology",
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam.",
+    imageCount: 2
+  },
+];
+
+/* ============================================================
+   PAGE ROUTER
+   This is the core of the single-page system.
+   showPage() is the ONLY function that switches pages.
+   It:
+   1. Hides all pages by removing .is-visible
+   2. Shows only the requested page by adding .is-visible
+   3. Updates navbar button states
+   4. Shows/hides the background canvas
+   5. Shows/hides the skill panel (work-only feature)
+   6. Triggers page-specific setup if needed
+============================================================ */
+function showPage(pageName) {
+
+  /* --- Hide all pages --- */
+  document.querySelectorAll('.page').forEach(function(pageElement) {
+    pageElement.classList.remove('is-visible');
+  });
+
+  /* --- Deactivate all nav buttons --- */
+  document.querySelectorAll('.navbar-button').forEach(function(buttonElement) {
+    buttonElement.classList.remove('is-active');
+  });
+
+  /* --- Show only the requested page --- */
+  document.getElementById('page-' + pageName).classList.add('is-visible');
+
+  /* --- Activate the matching nav button --- */
+  document.getElementById('nav-' + pageName).classList.add('is-active');
+
+  /* --- Background canvas: hide on Work page, show elsewhere --- */
+  var canvas = document.getElementById('background-canvas');
+  canvas.style.opacity = (pageName === 'work') ? '0' : '1';
+
+  /* --- Skill panel: ONLY available on Work page ---
+       Toggling .is-hidden (display:none) keeps it completely
+       absent from the DOM visually on all other pages.
+       We also force-close it when leaving Work page. */
+  var skillPanel = document.getElementById('skill-detail-panel');
+  if (pageName === 'work') {
+    skillPanel.classList.remove('is-hidden');
+  } else {
+    skillPanel.classList.add('is-hidden');
+    skillPanel.classList.remove('is-open'); /* close if was open */
+  }
+
+  /* --- Page-specific actions --- */
+  if (pageName === 'home') {
+    /* Trigger the divider line animation */
+    setTimeout(function() {
+      document.getElementById('home-divider-line').classList.add('is-revealed');
+    }, 300);
+  }
+
+  if (pageName === 'portfolio') {
+    /* Build portfolio grid (only runs once) */
+    buildPortfolioPage();
+  }
+
+}
+
+/* ============================================================
+   GENERATIVE BEZIER BACKGROUND
+   Draws slowly drifting bezier curves on a canvas.
+   Each curve has a position, control points, and velocities.
+   Curves bounce off canvas edges.
+   TO CUSTOMIZE: Change 'numberOfCurves' for more/fewer curves.
+   Change alpha (0.038–0.08) to make curves more/less visible.
+============================================================ */
+var bgCanvas  = document.getElementById('background-canvas');
+var bgContext = bgCanvas.getContext('2d');
+var bgCurves  = [];
+var numberOfCurves = 14;
+
+/* Returns a random number between 0 and max */
+function randomUpTo(max) {
+  return Math.random() * max;
+}
+/* Returns a random velocity (positive or negative) up to speed */
+function randomVelocity(speed) {
+  return (Math.random() - 0.5) * speed;
+}
+/* Bounces a value off lo/hi walls, reversing velocity */
+function bounceValue(currentValue, velocity, lowerBound, upperBound) {
+  var newValue = currentValue + velocity;
+  if (newValue < lowerBound || newValue > upperBound) {
+    velocity = -velocity;
+    newValue = Math.max(lowerBound, Math.min(upperBound, newValue));
+  }
+  return [newValue, velocity];
+}
+
+function initializeBackgroundCurves() {
+  var w = bgCanvas.width;
+  var h = bgCanvas.height;
+  bgCurves = [];
+  for (var i = 0; i < numberOfCurves; i++) {
+    bgCurves.push({
+      /* Start point */
+      x0: randomUpTo(w), y0: randomUpTo(h),
+      /* First control point */
+      cx0: randomUpTo(w), cy0: randomUpTo(h),
+      /* Second control point */
+      cx1: randomUpTo(w), cy1: randomUpTo(h),
+      /* End point */
+      x1: randomUpTo(w), y1: randomUpTo(h),
+      /* Velocities for each coordinate */
+      vx0: randomVelocity(0.3),  vy0: randomVelocity(0.3),
+      vcx0: randomVelocity(0.22), vcy0: randomVelocity(0.22),
+      vcx1: randomVelocity(0.22), vcy1: randomVelocity(0.22),
+      vx1: randomVelocity(0.3),  vy1: randomVelocity(0.3),
+      /* Alpha: how visible the curve is (0 = invisible, 1 = solid) */
+      alpha: 0.038 + Math.random() * 0.042
+    });
+  }
+}
+
+function resizeBackgroundCanvas() {
+  bgCanvas.width  = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+  initializeBackgroundCurves();
+}
+
+function drawBackgroundFrame() {
+  var w = bgCanvas.width;
+  var h = bgCanvas.height;
+  bgContext.clearRect(0, 0, w, h);
+
+  bgCurves = bgCurves.map(function(curve) {
+    /* Update each point position, bouncing off edges */
+    var x0 = curve.x0, y0 = curve.y0;
+    var cx0 = curve.cx0, cy0 = curve.cy0;
+    var cx1 = curve.cx1, cy1 = curve.cy1;
+    var x1 = curve.x1,  y1 = curve.y1;
+    var vx0 = curve.vx0, vy0 = curve.vy0;
+    var vcx0 = curve.vcx0, vcy0 = curve.vcy0;
+    var vcx1 = curve.vcx1, vcy1 = curve.vcy1;
+    var vx1 = curve.vx1,  vy1 = curve.vy1;
+
+    var r;
+    r = bounceValue(x0, vx0, 0, w);   x0 = r[0];  vx0 = r[1];
+    r = bounceValue(y0, vy0, 0, h);   y0 = r[0];  vy0 = r[1];
+    r = bounceValue(cx0, vcx0, 0, w); cx0 = r[0]; vcx0 = r[1];
+    r = bounceValue(cy0, vcy0, 0, h); cy0 = r[0]; vcy0 = r[1];
+    r = bounceValue(cx1, vcx1, 0, w); cx1 = r[0]; vcx1 = r[1];
+    r = bounceValue(cy1, vcy1, 0, h); cy1 = r[0]; vcy1 = r[1];
+    r = bounceValue(x1, vx1, 0, w);   x1 = r[0];  vx1 = r[1];
+    r = bounceValue(y1, vy1, 0, h);   y1 = r[0];  vy1 = r[1];
+
+    /* Draw the curve */
+    bgContext.beginPath();
+    bgContext.moveTo(x0, y0);
+    bgContext.bezierCurveTo(cx0, cy0, cx1, cy1, x1, y1);
+    bgContext.strokeStyle = 'rgba(0,0,0,' + curve.alpha + ')';
+    bgContext.lineWidth   = 0.85;
+    bgContext.stroke();
+
+    return { x0:x0,y0:y0, cx0:cx0,cy0:cy0, cx1:cx1,cy1:cy1, x1:x1,y1:y1,
+             vx0:vx0,vy0:vy0, vcx0:vcx0,vcy0:vcy0, vcx1:vcx1,vcy1:vcy1, vx1:vx1,vy1:vy1,
+             alpha:curve.alpha };
+  });
+
+  requestAnimationFrame(drawBackgroundFrame);
+}
+
+/* Initialize and start canvas */
+resizeBackgroundCanvas();
+window.addEventListener('resize', resizeBackgroundCanvas);
+drawBackgroundFrame();
+
+/* ============================================================
+   WORK PAGE — WORD CLUSTERS
+   Each cluster is an SVG with:
+   - Thin lines from center to each skill word
+   - Floating skill words that gently drift
+   - A small tooltip in the SVG on hover
+   - A full detail panel (bottom of screen) on hover
+   - Clickable center word that opens résumé PDF
+============================================================ */
+
+/* SVG coordinate space */
+var SVG_WIDTH  = 660;
+var SVG_HEIGHT = 540;
+var SVG_CENTER_X = SVG_WIDTH  / 2;
+var SVG_CENTER_Y = SVG_HEIGHT / 2;
+var SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
+/* Orbit radius and stored positions for float animation */
+var ORBIT_RADIUS = 195;
+var storedClusterPositions = []; /* base positions for each cluster's words */
+
+/* Which cluster is currently visible (0-indexed) */
+var activeClusterIndex = 0;
+
+/* rAF handle for float animation loop */
+var floatAnimationHandle = null;
+
+/* Delay handle for closing skill panel */
+var skillPanelCloseDelay = null;
+
+/* Whether work page clusters have been built yet */
+var workPageIsBuilt = false;
+
+/*
+  Calculates orbit positions for each word in a cluster.
+  Words are evenly distributed around an ellipse.
+  Small jitter values create a more organic layout.
+*/
+function calculateWordPositions(wordList) {
+  var jitterValues = [-10, 14, 4, -6, 18, 8, -14, 6, -4, 16, -8, 10, 2, -12, 14];
+  return wordList.map(function(word, index) {
+    var angle          = (index / wordList.length) * Math.PI * 2 - Math.PI / 2;
+    var radiusX        = ORBIT_RADIUS + jitterValues[index % jitterValues.length];
+    var radiusY        = radiusX * 0.68; /* slight vertical compression = ellipse */
+    return {
+      baseX: SVG_CENTER_X + radiusX * Math.cos(angle),
+      baseY: SVG_CENTER_Y + radiusY * Math.sin(angle)
+    };
+  });
+}
+
+/*
+  Builds one SVG cluster element for a given cluster data object.
+  Returns a complete SVG element ready to be placed in a slide.
+*/
+function buildClusterSVG(clusterData, clusterIndex) {
+  var svg = document.createElementNS(SVG_NAMESPACE, 'svg');
+  svg.setAttribute('viewBox', '0 0 ' + SVG_WIDTH + ' ' + SVG_HEIGHT);
+  svg.style.cssText = 'width:100%;height:100%;overflow:visible;display:block;';
+
+  var wordPositions = calculateWordPositions(clusterData.words);
+  storedClusterPositions[clusterIndex] = wordPositions;
+
+  /* --- Draw connection lines from center to each word --- */
+  wordPositions.forEach(function(position, wordIndex) {
+    var line = document.createElementNS(SVG_NAMESPACE, 'line');
+    line.setAttribute('x1', SVG_CENTER_X);
+    line.setAttribute('y1', SVG_CENTER_Y);
+    line.setAttribute('x2', position.baseX);
+    line.setAttribute('y2', position.baseY);
+    line.setAttribute('stroke', '#000');
+    line.setAttribute('stroke-width', '0.6');
+    line.setAttribute('stroke-opacity', '0.1');
+    line.id = 'cluster-line-' + clusterIndex + '-' + wordIndex;
+    svg.appendChild(line);
+  });
+
+  /* --- Build SVG tooltip (small inline label) ---
+       Appended last so it renders above the word text */
+  var tooltipGroup = document.createElementNS(SVG_NAMESPACE, 'g');
+  tooltipGroup.id = 'svg-tooltip-' + clusterIndex;
+  tooltipGroup.style.display      = 'none';
+  tooltipGroup.style.pointerEvents = 'none';
+
+  var tooltipBackground = document.createElementNS(SVG_NAMESPACE, 'rect');
+  tooltipBackground.setAttribute('width', '204');
+  tooltipBackground.setAttribute('height', '26');
+  tooltipBackground.setAttribute('rx', '1');
+  tooltipBackground.setAttribute('fill', '#fff');
+  tooltipBackground.setAttribute('stroke', '#000');
+  tooltipBackground.setAttribute('stroke-width', '0.5');
+  tooltipBackground.setAttribute('stroke-opacity', '0.36');
+
+  var tooltipText = document.createElementNS(SVG_NAMESPACE, 'text');
+  tooltipText.setAttribute('text-anchor', 'middle');
+  tooltipText.setAttribute('dominant-baseline', 'middle');
+  tooltipText.style.cssText = 'font-family:"Times New Roman",serif;font-size:9.5px;fill:#000;';
+
+  tooltipGroup.appendChild(tooltipBackground);
+  tooltipGroup.appendChild(tooltipText);
+
+  /* --- Draw each skill word --- */
+  clusterData.words.forEach(function(wordData, wordIndex) {
+    var position = wordPositions[wordIndex];
+    var wordText = document.createElementNS(SVG_NAMESPACE, 'text');
+    wordText.setAttribute('x', position.baseX);
+    wordText.setAttribute('y', position.baseY);
+    wordText.setAttribute('text-anchor', 'middle');
+    wordText.setAttribute('dominant-baseline', 'middle');
+    wordText.style.cssText =
+      'font-family:"Times New Roman",serif;' +
+      'font-size:11px;fill:#000;opacity:0.56;' +
+      'cursor:pointer;user-select:none;transition:opacity 0.2s;';
+    wordText.textContent = wordData.t;
+    wordText.id = 'cluster-word-' + clusterIndex + '-' + wordIndex;
+
+    /* Mouse enter: highlight word, show tooltip, open skill panel */
+    wordText.addEventListener('mouseenter', function() {
+      wordText.style.opacity    = '1';
+      wordText.style.fontWeight = '700';
+
+      /* Highlight the connection line */
+      var connectionLine = document.getElementById('cluster-line-' + clusterIndex + '-' + wordIndex);
+      if (connectionLine) {
+        connectionLine.setAttribute('stroke-opacity', '0.32');
+      }
+
+      /* Position and show the SVG tooltip */
+      var isInBottomHalf = position.baseY > SVG_HEIGHT * 0.5;
+      var tooltipY = isInBottomHalf ? position.baseY - 38 : position.baseY + 14;
+      tooltipBackground.setAttribute('x', position.baseX - 102);
+      tooltipBackground.setAttribute('y', tooltipY);
+      tooltipText.setAttribute('x', position.baseX);
+      tooltipText.setAttribute('y', tooltipY + 13);
+      var summaryText = wordData.summary || '';
+      tooltipText.textContent = summaryText.length > 58
+        ? summaryText.slice(0, 58) + '…'
+        : summaryText;
+      tooltipGroup.style.display = '';
+
+      /* Open the bottom skill panel */
+      clearTimeout(skillPanelCloseDelay);
+      openSkillPanel(wordData.t, wordData.summary, wordData.bullets);
+    });
+
+    /* Mouse leave: restore word, hide tooltip, schedule panel close */
+    wordText.addEventListener('mouseleave', function() {
+      wordText.style.opacity    = '0.56';
+      wordText.style.fontWeight = '400';
+
+      var connectionLine = document.getElementById('cluster-line-' + clusterIndex + '-' + wordIndex);
+      if (connectionLine) {
+        connectionLine.setAttribute('stroke-opacity', '0.1');
+      }
+
+      tooltipGroup.style.display = 'none';
+
+      /* Small delay before closing panel so fast mouse moves don't flash it */
+      skillPanelCloseDelay = setTimeout(closeSkillPanel, 280);
+    });
+
+    svg.appendChild(wordText);
+  });
+
+  /* Append tooltip on top of words */
+  svg.appendChild(tooltipGroup);
+
+  /* --- Center label (the main discipline word) --- */
+  var centerLabel = document.createElementNS(SVG_NAMESPACE, 'text');
+  centerLabel.setAttribute('x', SVG_CENTER_X);
+  centerLabel.setAttribute('y', SVG_CENTER_Y);
+  centerLabel.setAttribute('text-anchor', 'middle');
+  centerLabel.setAttribute('dominant-baseline', 'middle');
+  centerLabel.style.cssText =
+    'font-family:"Times New Roman",serif;' +
+    'font-size:' + clusterData.labelFontSize + 'px;' +
+    'font-weight:700;fill:#000;letter-spacing:0.1em;' +
+    'user-select:none;cursor:pointer;';
+  centerLabel.textContent = clusterData.label;
+
+  /* Click center word to open résumé PDF */
+  centerLabel.addEventListener('click', function() {
+    /* TO CUSTOMIZE: Replace alert with window.open(clusterData.resumeFile, '_blank') */
+    alert('Open résumé: ' + clusterData.label + '\n\nTo activate: replace this alert() in the code with:\nwindow.open("' + clusterData.resumeFile + '", "_blank")');
+  });
+  svg.appendChild(centerLabel);
+
+  /* "VIEW RÉSUMÉ" hint text below center label */
+  var resumeHint = document.createElementNS(SVG_NAMESPACE, 'text');
+  resumeHint.setAttribute('x', SVG_CENTER_X);
+  resumeHint.setAttribute('y', SVG_CENTER_Y + clusterData.labelFontSize * 0.85 + 6);
+  resumeHint.setAttribute('text-anchor', 'middle');
+  resumeHint.style.cssText =
+    'font-family:"Times New Roman",serif;font-size:8px;fill:#000;' +
+    'opacity:0.26;letter-spacing:0.16em;pointer-events:none;';
+  resumeHint.textContent = 'VIEW RÉSUMÉ ↗';
+  svg.appendChild(resumeHint);
+
+  return svg;
+}
+
+/*
+  Builds the entire Work page:
+  - Creates a slide div for each cluster
+  - Injects the SVG into each slide
+  - Creates dot indicators
+  - Starts the float animation loop
+  Only runs once (guarded by workPageIsBuilt flag).
+*/
+function buildWorkPage() {
+  if (workPageIsBuilt) return;
+  workPageIsBuilt = true;
+
+  var viewport = document.getElementById('cluster-viewport');
+  var dotRow   = document.getElementById('cluster-dot-row');
+  viewport.innerHTML = '';
+  dotRow.innerHTML   = '';
+
+  ALL_CLUSTERS.forEach(function(clusterData, clusterIndex) {
+
+    /* Create slide container */
+    var slide = document.createElement('div');
+    slide.className = 'cluster-slide' + (clusterIndex === 0 ? ' is-active' : '');
+    slide.id = 'cluster-slide-' + clusterIndex;
+    slide.appendChild(buildClusterSVG(clusterData, clusterIndex));
+    viewport.appendChild(slide);
+
+    /* Create dot indicator */
+    var dot = document.createElement('button');
+    dot.className = 'cluster-dot' + (clusterIndex === 0 ? ' is-active' : '');
+    dot.id = 'cluster-dot-' + clusterIndex;
+    dot.setAttribute('aria-label', 'Go to ' + clusterData.label);
+    dot.addEventListener('click', function() { goToCluster(clusterIndex); });
+    dotRow.appendChild(dot);
+
+  });
+
+  startWordFloatAnimation();
+}
+
+/*
+  Animates skill words with a gentle floating motion.
+  Each word floats independently using sine/cosine offsets.
+  Runs continuously using requestAnimationFrame.
+*/
+function startWordFloatAnimation() {
+  if (floatAnimationHandle) cancelAnimationFrame(floatAnimationHandle);
+
+  function animationTick(timestamp) {
+    ALL_CLUSTERS.forEach(function(clusterData, clusterIndex) {
+      var positions = storedClusterPositions[clusterIndex];
+      if (!positions) return;
+
+      clusterData.words.forEach(function(wordData, wordIndex) {
+        var wordElement = document.getElementById('cluster-word-' + clusterIndex + '-' + wordIndex);
+        if (!wordElement) return;
+
+        var position        = positions[wordIndex];
+        var floatAmountX    = Math.sin(wordIndex * 1.7) * 5;   /* horizontal drift range */
+        var floatAmountY    = Math.cos(wordIndex * 2.3) * 4.2; /* vertical drift range */
+        var cycleDuration   = 3200 + (wordIndex % 5) * 550;    /* each word has unique speed */
+        var cycleAngle      = ((timestamp / cycleDuration) + wordIndex * 0.6) % 1 * Math.PI * 2;
+
+        wordElement.setAttribute('x', position.baseX + Math.sin(cycleAngle) * floatAmountX);
+        wordElement.setAttribute('y', position.baseY + Math.cos(cycleAngle) * floatAmountY);
+      });
+    });
+
+    floatAnimationHandle = requestAnimationFrame(animationTick);
+  }
+
+  floatAnimationHandle = requestAnimationFrame(animationTick);
+}
+
+/*
+  Transitions from the current cluster to a new one.
+  Slides the old cluster out, slides the new one in.
+*/
+function goToCluster(nextIndex) {
+  if (nextIndex === activeClusterIndex) return;
+
+  var direction  = nextIndex > activeClusterIndex ? 1 : -1;
+  var oldSlide   = document.getElementById('cluster-slide-' + activeClusterIndex);
+  var newSlide   = document.getElementById('cluster-slide-' + nextIndex);
+  var oldDot     = document.getElementById('cluster-dot-'   + activeClusterIndex);
+  var newDot     = document.getElementById('cluster-dot-'   + nextIndex);
+
+  /* Exit old slide in the correct direction */
+  oldSlide.classList.remove('is-active');
+  oldSlide.classList.add(direction > 0 ? 'is-exiting-left' : 'is-exiting-right');
+  setTimeout(function() {
+    oldSlide.classList.remove('is-exiting-left', 'is-exiting-right');
+  }, 520);
+
+  /* Prime new slide off-screen, then animate in */
+  newSlide.style.transition = 'none';
+  newSlide.style.transform  = 'translateX(' + (direction > 0 ? 80 : -80) + 'px)';
+  newSlide.style.opacity    = '0';
+  newSlide.getBoundingClientRect(); /* force browser reflow */
+  newSlide.style.transition = '';
+  newSlide.style.transform  = '';
+  newSlide.style.opacity    = '';
+  newSlide.classList.add('is-active');
+
+  /* Update dots */
+  oldDot.classList.remove('is-active');
+  newDot.classList.add('is-active');
+
+  /* Update counter text */
+  activeClusterIndex = nextIndex;
+  document.getElementById('cluster-page-counter').textContent =
+    String(nextIndex + 1).padStart(2, '0') + ' / ' +
+    String(ALL_CLUSTERS.length).padStart(2, '0');
+}
+
+/* Called by the arrow buttons. dir = -1 (prev) or 1 (next) */
+function navigateCluster(direction) {
+  var nextIndex = (activeClusterIndex + direction + ALL_CLUSTERS.length) % ALL_CLUSTERS.length;
+  goToCluster(nextIndex);
+}
+
+/* ============================================================
+   SKILL DETAIL PANEL CONTROLS
+   Opens the bottom panel with skill name, summary, and bullets.
+   Closes either by timeout (on mouse leave) or the X button.
+============================================================ */
+function openSkillPanel(skillName, skillSummary, skillBullets) {
+  /* Fill in the name */
+  document.getElementById('skill-panel-name').textContent    = skillName;
+  document.getElementById('skill-panel-summary').textContent = skillSummary;
+
+  /* Build bullet list */
+  var bulletList = document.getElementById('skill-panel-bullets');
+  bulletList.innerHTML = '';
+  (skillBullets || []).forEach(function(bulletText) {
+    var listItem = document.createElement('li');
+    listItem.textContent = bulletText;
+    bulletList.appendChild(listItem);
+  });
+
+  document.getElementById('skill-detail-panel').classList.add('is-open');
+}
+
+function closeSkillPanel() {
+  document.getElementById('skill-detail-panel').classList.remove('is-open');
+}
+
+/* ============================================================
+   PORTFOLIO PAGE BUILDER
+   Creates project tiles and injects them into the grid.
+   Each tile has:
+   - A placeholder thumbnail (SVG X pattern)
+   - A resting strip (visible at rest: category + title)
+   - An info panel (visible on hover: full info + button)
+   Only runs once (guarded by portfolioIsBuilt flag).
+============================================================ */
+var portfolioIsBuilt = false;
+
+/* Returns an SVG placeholder image string (grey box with X) */
+function makePlaceholderImageSVG() {
+  return '<svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<rect width="100" height="100" fill="#ebebeb"/>' +
+    '<line x1="0" y1="0" x2="100" y2="100" stroke="#c0c0c0" stroke-width="0.8"/>' +
+    '<line x1="100" y1="0" x2="0" y2="100" stroke="#c0c0c0" stroke-width="0.8"/>' +
+    '<rect x="0" y="0" width="100" height="100" fill="none" stroke="#d0d0d0" stroke-width="0.5"/>' +
+    '</svg>';
+}
+
+function buildPortfolioPage() {
+  if (portfolioIsBuilt) return;
+  portfolioIsBuilt = true;
+
+  var grid = document.getElementById('project-grid');
+
+  ALL_PROJECTS.forEach(function(projectData, projectIndex) {
+    var tile = document.createElement('div');
+    tile.className = 'project-tile';
+
+    tile.innerHTML =
+      /* Thumbnail (overflow:hidden clips the image only, not the panel below) */
+      '<div class="project-thumbnail-wrapper">' +
+        '<div class="project-thumbnail">' +
+          makePlaceholderImageSVG() +
+        '</div>' +
+      '</div>' +
+
+      /* Resting strip — always visible, fades out on hover */
+      '<div class="project-resting-strip">' +
+        '<p class="resting-strip-category">' + projectData.category + '</p>' +
+        '<p class="resting-strip-title">'    + projectData.title    + '</p>' +
+      '</div>' +
+
+      /* Info panel — hidden at rest, expands on hover */
+      '<div class="project-info-panel">' +
+        '<div class="project-info-inner">' +
+          '<p class="project-info-category">'    + projectData.category    + '</p>' +
+          '<h3 class="project-info-title">'      + projectData.title       + '</h3>' +
+          '<p class="project-info-description">' + projectData.description + '</p>' +
+          '<button class="project-view-button" data-project-index="' + projectIndex + '">' +
+            'VIEW IMAGES ↗' +
+          '</button>' +
+        '</div>' +
+      '</div>';
+
+    /* "View Images" button opens lightbox */
+    tile.querySelector('.project-view-button').addEventListener('click', function(event) {
+      event.stopPropagation(); /* prevent tile hover from interfering */
+      openLightbox(projectData);
+    });
+
+    grid.appendChild(tile);
+
+    /* Staggered entrance animation — each tile reveals slightly after the previous */
+    setTimeout(function() {
+      tile.classList.add('is-revealed');
+    }, 60 + projectIndex * 75);
+  });
+}
+
+/* ============================================================
+   LIGHTBOX CONTROLS
+   Opens a full-screen overlay showing project images.
+   Image slots are placeholder SVGs for now.
+   TO CUSTOMIZE: Replace makePlaceholderImageSVG() with real
+   <img> tags pointing to your actual image files.
+============================================================ */
+function openLightbox(projectData) {
+  /* Fill header */
+  document.getElementById('lightbox-category').textContent    = projectData.category;
+  document.getElementById('lightbox-title').textContent       = projectData.title;
+  document.getElementById('lightbox-description').textContent = projectData.description;
+
+  /* Build image grid with placeholder slots */
+  var imageGrid = document.getElementById('lightbox-image-grid');
+  imageGrid.innerHTML = '';
+  for (var i = 0; i < (projectData.imageCount || 2); i++) {
+    var slot = document.createElement('div');
+    slot.className = 'lightbox-image-slot';
+    slot.innerHTML = makePlaceholderImageSVG();
+    imageGrid.appendChild(slot);
+  }
+
+  /* Show lightbox */
+  document.getElementById('lightbox-overlay').classList.add('is-open');
+  document.body.style.overflow = 'hidden'; /* prevent background scroll */
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox-overlay').classList.remove('is-open');
+  document.body.style.overflow = '';
+}
+
+/* ============================================================
+   KEYBOARD SHORTCUTS
+   Escape closes any open overlay.
+============================================================ */
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    closeLightbox();
+    closeSkillPanel();
+  }
+});
+
+/* ============================================================
+   INITIALIZATION
+   Runs once on page load.
+   - Trigger home divider animation
+   - Build the work page clusters
+======================================
