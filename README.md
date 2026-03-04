@@ -1,6 +1,8 @@
 # Gabriel Aguilar — Portfolio
 
-A minimal, editorial portfolio website for Gabriel Aguilar. Built as a single, self-contained HTML file with zero external dependencies. Open it in any browser and it works immediately.
+A minimal, editorial portfolio website for Gabriel Aguilar. Built as a single, self-contained HTML file with zero external dependencies. Open it in any browser and it works immediately. 
+
+Developed in collaboration with Claude Sonnet 4.6
 
 ---
 
