@@ -435,59 +435,377 @@ var ALL_CLUSTERS = [
     labelFontSize: 28,
     resumeFile: "assets/pdfs/Gabriel_Aguilar_Film_Resume.pdf",
     words: [
-      { t: "Video Editing",    summary: "Post-production editing for narrative and commercial projects.",   bullets: getLoremBullets(4) },
-      { t: "Post Supervision", summary: "Overseeing the full post-production pipeline.",                    bullets: getLoremBullets(4) },
-      { t: "Digital Imaging",  summary: "DIT work and on-set color management.",                           bullets: getLoremBullets(3) },
-      { t: "Directing",        summary: "Short-form narrative and documentary direction.",                  bullets: getLoremBullets(5) },
-      { t: "Asst. Camera",     summary: "Focus pulling and camera department support.",                     bullets: getLoremBullets(4) },
-      { t: "Best Boy Grip",    summary: "Lighting grip and rigging coordination.",                          bullets: getLoremBullets(3) },
-      { t: "Electric",         summary: "On-set electrical and lighting setup.",                            bullets: getLoremBullets(3) },
-      { t: "Asst. Director",   summary: "Scheduling, logistics, and set management.",                       bullets: getLoremBullets(4) },
-      { t: "Set Design",       summary: "Designing and dressing production environments.",                  bullets: getLoremBullets(3) },
-      { t: "DSLR Photography", summary: "Still photography with DSLR and mirrorless systems.",             bullets: getLoremBullets(4) },
-      { t: "After Effects",    summary: "Motion graphics, compositing, and VFX.",                          bullets: getLoremBullets(5) },
-      { t: "Premiere Pro",     summary: "Non-linear editing in Adobe Premiere Pro.",                        bullets: getLoremBullets(4) },
-      { t: "DaVinci Resolve",  summary: "Color grading and finishing in DaVinci Resolve.",                 bullets: getLoremBullets(4) },
-      { t: "Color Correction", summary: "Primary and secondary color correction workflows.",               bullets: getLoremBullets(3) },
-      { t: "Voice Over",       summary: "Direction and production of voice-over sessions.",                bullets: getLoremBullets(3) },
+      {
+        t: "Video Editing",
+        summary: "Non-linear post-production editing for narrative, commercial, and branded content.",
+        bullets: [
+          "Edited branded content for Johnson & Johnson's Live Healthy Live Well internal campaign at MCM Creative",
+          "Cut promotional content for The Princess Grace Foundation, Mount Sinai Hospital, and Schulte Roth & Zabel",
+          "Edited event video for The Moth Project and promotional content for GRIT Boxing",
+          "Directed and edited award-winning short film I Have A Confidence Issue — Best Film, Youth Arts Exhibition",
+        ]
+      },
+      {
+        t: "Digital Imaging",
+        summary: "On-set and in-post image management including color pipeline setup.",
+        bullets: [
+          "Operated video playback, projection, and camera systems at The Public Theater across multiple productions",
+          "Managed camera feed routing and live imaging for hybrid theatrical livestream (Circle Jerk, Fake Friends LLC)",
+          "Contributed to camera rig design as Assistant Video Engineer on Circle Jerk at The Connelly",
+        ]
+      },
+      {
+        t: "Directing",
+        summary: "Short-form narrative direction for film and multimedia projects.",
+        bullets: [
+          "Directed and wrote I Have A Confidence Issue — won Best Film at the Youth Arts Exhibition",
+          "Directed Neon Noir, a multimedia performance piece, at CASA",
+          "Developed 2.5D surreal narrative game concept with full character and environment direction",
+        ]
+      },
+      {
+        t: "Asst. Camera",
+        summary: "Camera department support including systems management and live operation.",
+        bullets: [
+          "Operated and maintained camera systems at The Public Theater for live theatrical productions",
+          "Managed multi-camera systems and live feed routing for Circle Jerk hybrid livestream",
+          "Contributed to camera rig design as promoted AVE on Circle Jerk within two days of load-in",
+        ]
+      },
+      {
+        t: "Electric",
+        summary: "On-set and in-venue electrical setup for film and live production.",
+        bullets: [
+          "Worked as Theater Electrician at MITU 580 (Feb 2024 & Jun 2025) — installation, load-in, strike",
+          "Managed circuit distribution and DMX addressing for lighting systems at Camp Chen-A-Wanda",
+          "Supported electrical and lighting setup across freelance gigs at The Connelly and The Public",
+        ]
+      },
+      {
+        t: "Asst. Director",
+        summary: "Scheduling, logistics, and coordination across productions.",
+        bullets: [
+          "Managed rehearsal schedules, props tracking, and blocking as ASM on A Play Titled After the Collective Noun (Corkscrew Theater Festival)",
+          "Coordinated backstage operations and cue calls as ASM on A Real Boy (Ivy Theater Company, 59E59)",
+          "Communicated technical setup details from load-in to run crew across freelance gigs",
+        ]
+      },
+      {
+        t: "Set Design",
+        summary: "Designing and dressing production environments for performance and film.",
+        bullets: [
+          "Sourced, fabricated, and maintained props for I'm Still Here (Imaginarium Theater Company, The Tank)",
+          "Contributed to environmental and spatial design for Neon Noir multimedia production at CASA",
+          "Developed PORTALS installation series — handmade portal frames housing virtual tableaus on LED screens inserted into walls and surfaces",
+        ]
+      },
+      {
+        t: "DSLR Photography",
+        summary: "Still and motion photography with DSLR and mirrorless camera systems.",
+        bullets: [
+          "DSLR cinematography across narrative and commercial projects at MCM Creative",
+          "Used DSLR systems in production documentation and content capture for branded client work",
+          "Applied photography skills to visual development for portfolio and personal projects",
+        ]
+      },
+      {
+        t: "After Effects",
+        summary: "Motion graphics, compositing, and visual effects in Adobe After Effects.",
+        bullets: [
+          "Created motion graphics for Johnson & Johnson's Live Healthy Live Well campaign at MCM Creative",
+          "Applied After Effects compositing to branded content for Princess Grace Foundation and Mount Sinai",
+          "Used After Effects for title sequences and visual storytelling elements in narrative edits",
+        ]
+      },
+      {
+        t: "Premiere Pro",
+        summary: "Non-linear editing in Adobe Premiere Pro across commercial and narrative projects.",
+        bullets: [
+          "Primary editing tool at MCM Creative (2019–2023) for all client deliverables",
+          "Cut I Have A Confidence Issue in Premiere Pro — awarded Best Film at Youth Arts Exhibition",
+          "Used Premiere Pro for narrative edits, performance documentation, and social content across 4+ years of professional work",
+        ]
+      },
+      {
+        t: "DaVinci Resolve",
+        summary: "Color grading, finishing, and editing in DaVinci Resolve.",
+        bullets: [
+          "Used DaVinci Resolve for color grading and finishing on commercial and branded content projects",
+          "Applied color correction workflows to deliver polished, client-ready video at MCM Creative",
+          "Utilized Resolve's color pipeline for narrative and documentary-style content",
+        ]
+      },
+      {
+        t: "Color Correction",
+        summary: "Primary and secondary color correction across post-production workflows.",
+        bullets: [
+          "Applied color correction to all MCM Creative client deliverables including J&J and Princess Grace Foundation content",
+          "Used both DaVinci Resolve and Premiere Pro color tools across 4 years of professional editing",
+          "Developed eye for color consistency across multi-clip branded and narrative projects",
+        ]
+      },
+      {
+        t: "Voice Over",
+        summary: "Audio direction and production including voice and sound editorial.",
+        bullets: [
+          "Managed audio input and sound editing across post-production work at MCM Creative",
+          "Coordinated audio with performance and pyrotechnic timing as Sound Engineer for Camp Chen-A-Wanda Annual Fireworks Display",
+          "Applied sound editing skills to narrative and commercial video projects",
+        ]
+      },
     ]
   },
+
   {
     label: "THEATER",
     labelFontSize: 26,
     resumeFile: "assets/pdfs/Gabriel_Aguilar_Theater_Resume.pdf",
     words: [
-      { t: "Writing",             summary: "Original playwriting and script development.",                  bullets: getLoremBullets(4) },
-      { t: "Directing",           summary: "Stage direction for drama, comedy, and devised work.",          bullets: getLoremBullets(5) },
-      { t: "Acting",              summary: "Performance in theatrical and experimental productions.",        bullets: getLoremBullets(4) },
-      { t: "Stage Design",        summary: "Scenic design and spatial storytelling.",                       bullets: getLoremBullets(4) },
-      { t: "Lighting Design",     summary: "Theatrical lighting plots and cue programming.",                bullets: getLoremBullets(5) },
-      { t: "Stage Management",    summary: "Production coordination and rehearsal management.",             bullets: getLoremBullets(4) },
-      { t: "Board Operation",     summary: "Live operation of lighting and sound consoles.",               bullets: getLoremBullets(3) },
-      { t: "Video Engineering",   summary: "Live video systems in theatrical contexts.",                    bullets: getLoremBullets(3) },
-      { t: "Electrics",           summary: "Theatrical electrical rigging and fixture maintenance.",        bullets: getLoremBullets(3) },
-      { t: "Technical Directing", summary: "Overseeing technical elements across departments.",             bullets: getLoremBullets(4) },
-      { t: "Carpentry",           summary: "Scenic carpentry and construction.",                            bullets: getLoremBullets(3) },
-      { t: "Networking",          summary: "Technical networking for live production systems.",             bullets: getLoremBullets(3) },
+      {
+        t: "Writing",
+        summary: "Original writing for theater, film, and interactive narrative.",
+        bullets: [
+          "Wrote and directed I Have A Confidence Issue — awarded Best Film at Youth Arts Exhibition",
+          "Wrote Mankind (in development) — a theater piece following cavemen constructing society and culture",
+          "Wrote cryoCommunist Play (in development) — set in a frozen communist alien society with class system dynamics",
+          "Co-developing The One True World, a novel series following two protagonists in a fantasy war-torn world",
+        ]
+      },
+      {
+        t: "Directing",
+        summary: "Stage and screen direction spanning theater, multimedia, and devised work.",
+        bullets: [
+          "Directed Neon Noir, a multimedia performance piece, at CASA",
+          "Directed and wrote I Have A Confidence Issue — Best Film, Youth Arts Exhibition",
+          "Directed all technical aspects of youth theater productions as Technical Director at Camp Chen-A-Wanda (2021–Present)",
+          "Developing Cruise de Carnivore — a virtual XR play where users follow individual passengers through a wartime cruise ship narrative",
+        ]
+      },
+      {
+        t: "Acting",
+        summary: "Trained performer with 6 years of acting training and musical theater credits.",
+        bullets: [
+          "Berger in Hair — Weary Arts Group",
+          "Seymour in Little Shop of Horrors — Stuart Landon",
+          "Oscar Lindquist in Sweet Charity — Stuart Landon",
+          "Danny in Grease — Allenberry Playhouse",
+          "Lewis in Pippin — CASA",
+          "6 years acting training at Aalsedek Theatre School; 3 years voice training with David Glasgow",
+        ]
+      },
+      {
+        t: "Stage Design",
+        summary: "Scenic and spatial design for theatrical and immersive productions.",
+        bullets: [
+          "Designed environments for Neon Noir multimedia production at CASA",
+          "Developed PORTALS installation series — portal frames housing virtual tableaus mounted into architectural surfaces",
+          "Conceptualized Witching Hour installation — multi-screen witch trial simulation with sound and heating elements",
+          "Designed immersive spatial layouts for youth theater at Camp Chen-A-Wanda",
+        ]
+      },
+      {
+        t: "Lighting Design",
+        summary: "Theatrical lighting design, programming, and systems operation.",
+        bullets: [
+          "Lighting Designer for youth theater productions at Camp Chen-A-Wanda, Shield's Theater (2021–Present)",
+          "DMX addressing, circuit distribution, and lighting programming across freelance gigs",
+          "Theater Electrician at MITU 580 (Feb 2024 & Jun 2025) — installation and maintenance of theatrical lighting systems",
+          "Supported lighting assembly and rigging at The Connelly and The Public Theater",
+        ]
+      },
+      {
+        t: "Stage Management",
+        summary: "Full production coordination from rehearsal to run.",
+        bullets: [
+          "ASM on A Play Titled After the Collective Noun for Female-Identifying 20-Somethings Living in NYC in the 2010s — Corkscrew Theater Festival",
+          "ASM on A Real Boy — Ivy Theater Company, 59E59",
+          "Managed rehearsal schedules, props tracking, and blocking documentation",
+          "Communicated key load-in and setup details to run crew across multiple freelance productions",
+        ]
+      },
+      {
+        t: "Board Operation",
+        summary: "Live operation of lighting and sound consoles during performance.",
+        bullets: [
+          "Operated lighting and sound systems for live youth theater productions at Camp Chen-A-Wanda",
+          "Managed live sound for Camp Chen-A-Wanda Annual Fireworks Display — coordinating audio with pyrotechnic timing",
+          "Operated video playback and projection systems live at The Public Theater across multiple productions",
+        ]
+      },
+      {
+        t: "Video Engineering",
+        summary: "Live video systems design and operation in theatrical contexts.",
+        bullets: [
+          "Video Technician at The Public Theater — video, projection, closed-captioning, and playback systems (May 2023–Present)",
+          "Assistant Video Engineer on Circle Jerk — managed camera systems, video routing, and live broadcast sync (Fake Friends LLC, The Connelly)",
+          "Promoted to AVE on Circle Jerk within two days; contributed to camera rig design",
+          "A/V Engineer on Comedy of Errors at The Public Theater",
+        ]
+      },
+      {
+        t: "Electrics",
+        summary: "Theatrical electrical rigging, installation, and fixture maintenance.",
+        bullets: [
+          "Theater Electrician at MITU 580 via Jacqueline Scaletta (Feb 2024 & Jun 2025)",
+          "Managed circuit distribution, DMX addressing, and signal termination across freelance gigs",
+          "Supported electrical installation and strike at The Connelly, The Public, and Corkscrew Theater Festival",
+          "Maintained all lighting infrastructure for youth theater at Camp Chen-A-Wanda",
+        ]
+      },
+      {
+        t: "Technical Directing",
+        summary: "Overseeing all technical departments and infrastructure for live productions.",
+        bullets: [
+          "Technical Director at Camp Chen-A-Wanda, Shield's Theater (2021–Present) — coordinates lighting, sound, rigging, and performance",
+          "Built Camp Chen-A-Wanda's A/V system from the ground up; modernized legacy infrastructure",
+          "Managed technical coordination across departments at The Connelly, The Public, and festival venues",
+          "Oversaw load-in, systems check, troubleshooting, and assembly for high-profile NYC theatrical productions",
+        ]
+      },
+      {
+        t: "Carpentry",
+        summary: "Scenic construction, props fabrication, and physical production.",
+        bullets: [
+          "Sourced, fabricated, and maintained props for I'm Still Here (Imaginarium Theater Company, The Tank)",
+          "Built custom control box and fabricated hardware for Peephole Shower physical computing installation",
+          "Physical construction and fabrication for PORTALS installation series",
+          "Hands-on assembly and rigging support across multiple theatrical load-ins",
+        ]
+      },
+      {
+        t: "Networking",
+        summary: "Technical networking for live production systems and real-time media.",
+        bullets: [
+          "Researched and presented on real-time networking for live events — TouchDesigner integration, latency modeling, data routing",
+          "Designed multi-streaming infrastructure for Theater LIVE! platform proposal — OBS, Restream.io, multi-platform broadcast architecture",
+          "Managed networked A/V systems and show networking across freelance theatrical productions",
+          "Studied protocol-based communication models for interactive performance systems at NYCCT",
+        ]
+      },
     ]
   },
+
   {
     label: "CREATIVE TECHNOLOGY",
     labelFontSize: 17,
     resumeFile: "assets/pdfs/Gabriel_Aguilar_CreativeTech_Resume.pdf",
     words: [
-      { t: "Projection Mapping", summary: "Real-time projection onto 3D surfaces.",                        bullets: getLoremBullets(5) },
-      { t: "Unity",              summary: "Real-time 3D development and interactive experiences.",          bullets: getLoremBullets(4) },
-      { t: "Unreal Engine",      summary: "Virtual production and high-fidelity rendering.",               bullets: getLoremBullets(4) },
-      { t: "Fabrication",        summary: "Physical prototyping and mixed-media construction.",            bullets: getLoremBullets(4) },
-      { t: "Robotics",           summary: "Programmable motion systems and kinetic installations.",        bullets: getLoremBullets(3) },
-      { t: "3D Printing",        summary: "FDM and resin printing for props and prototypes.",              bullets: getLoremBullets(3) },
-      { t: "CNC",                summary: "Computer-controlled milling and cutting.",                      bullets: getLoremBullets(3) },
-      { t: "LiDAR",              summary: "Spatial scanning and point-cloud capture.",                     bullets: getLoremBullets(4) },
-      { t: "Object Tracking",    summary: "Computer vision and real-time object recognition.",             bullets: getLoremBullets(4) },
-      { t: "HTML / CSS",         summary: "Front-end web development and interactive interfaces.",         bullets: getLoremBullets(4) },
-      { t: "Python",             summary: "Scripting, automation, and data-driven installations.",         bullets: getLoremBullets(5) },
-      { t: "JavaScript",         summary: "Interactive web experiences and creative coding.",              bullets: getLoremBullets(4) },
+      {
+        t: "Projection Mapping",
+        summary: "Real-time projection onto surfaces and spatial environments.",
+        bullets: [
+          "Designed and deployed projection-mapping systems for theatrical productions as freelance A/V engineer (2020–Present)",
+          "Integrated projection mapping into live performance environments at The Public Theater",
+          "Applied projection design to immersive spatial storytelling across NYC theatrical contexts",
+          "Studied projection-mapped space as a core axis of immersive theater design at NYCCT",
+        ]
+      },
+      {
+        t: "Unity",
+        summary: "Real-time 3D development for interactive games and experiences.",
+        bullets: [
+          "Developing 2.5D surreal narrative game in Unity — multi-character structure, surreal environments, camera-driven gameplay",
+          "Using Unity for interactive experience design within BTech Emerging Media Technologies curriculum",
+          "Planned Unity integration for PORTALS virtual tableau installation series",
+          "Exploring Unity as engine for Cruise de Carnivore XR theatrical experience",
+        ]
+      },
+      {
+        t: "Unreal Engine",
+        summary: "High-fidelity rendering and virtual production environments.",
+        bullets: [
+          "Studied Unreal Engine for virtual production and interactive environment design at NYCCT",
+          "Explored Unreal as a platform for game engine-based theatrical experiences (context: Theater LIVE! future work research)",
+          "Applied Unreal Engine toolset within BTech Emerging Media Technologies curriculum",
+        ]
+      },
+      {
+        t: "Fabrication",
+        summary: "Physical prototyping, custom hardware, and mixed-media construction.",
+        bullets: [
+          "Built custom control box and fabricated physical interface for Peephole Shower Arduino installation",
+          "Fabricated portal frames for PORTALS installation series — LED screens mounted into architectural surfaces",
+          "Hands-on assembly and rigging across 5+ years of theatrical production work",
+          "Developing Decentralized Creative Laboratory concept — physical fabrication stations for hybrid digital/analog workflow",
+        ]
+      },
+      {
+        t: "Robotics",
+        summary: "Programmable motion and sensor-driven interactive systems.",
+        bullets: [
+          "Applied microcontroller programming (Arduino) in physical computing coursework and personal installations",
+          "Explored sensor-based and actuator-driven systems in NYCCT emerging media curriculum",
+          "Researching kinetic and responsive systems for installation work including Interactive Dance Video Display concept",
+        ]
+      },
+      {
+        t: "3D Printing",
+        summary: "Additive manufacturing for props, prototypes, and installation components.",
+        bullets: [
+          "Used 3D modeling and fabrication tools within BTech Emerging Media Technologies curriculum at NYCCT",
+          "Applied rapid prototyping methodology — a core skill area in the Emerging Media Technologies program",
+          "Exploring 3D printing for props and physical components in PORTALS and Decentralized Creative Laboratory projects",
+        ]
+      },
+      {
+        t: "CNC",
+        summary: "Computer-controlled fabrication for scenic and installation work.",
+        bullets: [
+          "Studied CNC and digital fabrication within NYCCT BTech curriculum",
+          "Applied fabrication methodology in system integration and rapid prototyping coursework",
+          "Considering CNC fabrication for physical elements of Decentralized Creative Laboratory and PORTALS installation series",
+        ]
+      },
+      {
+        t: "LiDAR",
+        summary: "Spatial scanning, depth sensing, and point-cloud capture.",
+        bullets: [
+          "Researching depth sensing cameras and spatial capture as part of computer vision R&D at NYCCT",
+          "Exploring LiDAR and depth sensor integration for camera-based interactive installation work",
+          "Point cloud visualization concepts applied to personal portfolio website work page design",
+          "Depth sensing is a listed skill on Creative Technology resume — active area of independent R&D",
+        ]
+      },
+      {
+        t: "Object Tracking",
+        summary: "Computer vision and real-time object recognition for interactive systems.",
+        bullets: [
+          "Active R&D in computer vision at NYCCT — exploring machine perception, camera-based interaction, AI-assisted environments",
+          "Researching object tracking for use in live performance contexts — bodies, props, and spatial triggers",
+          "Interactive Dance Video Display concept relies on real-time movement tracking to generate live visuals and music",
+          "Computer vision listed as a core skill; active research area with prototyping work ongoing",
+        ]
+      },
+      {
+        t: "HTML / CSS",
+        summary: "Front-end web development and interactive interface design.",
+        bullets: [
+          "Built personal portfolio website using HTML/CSS — deployed on GitHub Pages",
+          "Designed information architecture and front-end structure for portfolio and project pages",
+          "Developed Theater LIVE! platform architecture including full website page specifications for company-side and viewer-side interfaces",
+          "Designed Civic Pulse platform UI — feed layout, poll interface, data export views, and bias labeling system",
+        ]
+      },
+      {
+        t: "Python",
+        summary: "Scripting, automation, and data-driven creative applications.",
+        bullets: [
+          "Applied Python in computational media and systems coursework at NYCCT",
+          "Used scripting for data processing and automation within emerging media technology projects",
+          "Exploring Python for computer vision pipelines and AI-assisted interactive environment work",
+          "Applied in rapid prototyping and system integration coursework within BTech program",
+        ]
+      },
+      {
+        t: "JavaScript",
+        summary: "Interactive web development and creative coding.",
+        bullets: [
+          "Planned React-based front-end for personal portfolio including procedural Bezier curve generative background system",
+          "Designed Civic Pulse as a web-based platform — JavaScript underpins the feed, polling, and data export interfaces",
+          "Applied JavaScript concepts in front-end architecture for portfolio and platform design projects",
+          "Exploring generative and algorithmic visual systems in JavaScript for portfolio work page",
+        ]
+      },
     ]
   }
 ];
