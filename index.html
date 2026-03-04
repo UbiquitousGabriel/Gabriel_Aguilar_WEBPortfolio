@@ -433,7 +433,7 @@ var ALL_CLUSTERS = [
   {
     label: "FILM",
     labelFontSize: 28,
-    resumeFile: "assets/pdfs/gabriel-aguilar-film.pdf",
+    resumeFile: "assets/pdfs/Gabriel_Aguilar_Film_Resume.pdf",
     words: [
       { t: "Video Editing",    summary: "Post-production editing for narrative and commercial projects.",   bullets: getLoremBullets(4) },
       { t: "Post Supervision", summary: "Overseeing the full post-production pipeline.",                    bullets: getLoremBullets(4) },
@@ -455,7 +455,7 @@ var ALL_CLUSTERS = [
   {
     label: "THEATER",
     labelFontSize: 26,
-    resumeFile: "assets/pdfs/gabriel-aguilar-theater.pdf",
+    resumeFile: "assets/pdfs/Gabriel_Aguilar_Theater_Resume.pdf",
     words: [
       { t: "Writing",             summary: "Original playwriting and script development.",                  bullets: getLoremBullets(4) },
       { t: "Directing",           summary: "Stage direction for drama, comedy, and devised work.",          bullets: getLoremBullets(5) },
@@ -474,7 +474,7 @@ var ALL_CLUSTERS = [
   {
     label: "CREATIVE TECHNOLOGY",
     labelFontSize: 17,
-    resumeFile: "assets/pdfs/gabriel-aguilar-creative-tech.pdf",
+    resumeFile: "assets/pdfs/Gabriel_Aguilar_CreativeTech_Resume.pdf",
     words: [
       { t: "Projection Mapping", summary: "Real-time projection onto 3D surfaces.",                        bullets: getLoremBullets(5) },
       { t: "Unity",              summary: "Real-time 3D development and interactive experiences.",          bullets: getLoremBullets(4) },
@@ -820,8 +820,9 @@ function buildClusterSVG(clusterData, clusterIndex) {
   /* TO CUSTOMIZE: Remove the alert and uncomment the window.open line */
   centerLabel.addEventListener('click', (function(resumePath, label) {
     return function() {
-      alert('Resume for: ' + label + '\n\nTo activate, find this alert() in the code and replace it with:\nwindow.open("' + resumePath + '", "_blank")');
-      /* window.open(resumePath, '_blank'); */
+        window.open(resumePath, '_blank');
+      /*alert('Resume for: ' + label + '\n\nTo activate, find this alert() in the code and replace it with:\nwindow.open("' + resumePath + '", "_blank")');
+       window.open(resumePath, '_blank'); */
     };
   })(clusterData.resumeFile, clusterData.label));
 
