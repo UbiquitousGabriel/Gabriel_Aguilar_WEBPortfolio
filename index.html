@@ -1172,6 +1172,25 @@ var floatAnimationHandle = null;
 var skillPanelCloseTimer = null;
 var workPageIsBuilt      = false;
 
+/* ------------------------------------------------------------
+   DRAG & SPRING-BACK
+   Grab any skill word and move it around. When you let go it
+   springs back toward its home spot with a little bounce.
+   Tweak the feel here:
+     SPRING_STIFFNESS - higher = snaps back harder/faster
+     SPRING_DAMPING   - closer to 1 = more bounce, lower = less
+     FLING_STRENGTH   - how much a flick carries into the bounce
+------------------------------------------------------------ */
+var SPRING_STIFFNESS = 0.045;
+var SPRING_DAMPING   = 0.90;
+var FLING_STRENGTH   = 0.6;
+var dragOffsets = {};   /* keyed 'cluster-word' -> {x, y, vx, vy, dragging} */
+function getDragState(clusterIndex, wordIndex) {
+  var key = clusterIndex + '-' + wordIndex;
+  if (!dragOffsets[key]) dragOffsets[key] = { x:0, y:0, vx:0, vy:0, dragging:false };
+  return dragOffsets[key];
+}
+
 /*
   Calculates the base X/Y position for each word in a cluster.
   Words are evenly spaced around an ellipse.
@@ -1190,6 +1209,14 @@ function calculateWordPositions(wordList) {
     });
   }
   return positions;
+}
+
+/* Converts a mouse/touch position into this SVG's own coordinate system. */
+function svgPointFromEvent(svgElement, event) {
+  var point = svgElement.createSVGPoint();
+  point.x = event.clientX; point.y = event.clientY;
+  var mapped = point.matrixTransform(svgElement.getScreenCTM().inverse());
+  return { x: mapped.x, y: mapped.y };
 }
 
 /*
@@ -1293,6 +1320,45 @@ function buildClusterSVG(clusterData, clusterIndex) {
         /* Small delay so fast mouse movements don't flash the panel shut */
         skillPanelCloseTimer = setTimeout(closeSkillPanel, 280);
       });
+
+      /* ---- Drag a word; it springs back when released ---- */
+      var dragState = getDragState(clusterIndex, wordIndex);
+      wordElement.style.touchAction = 'none';
+      wordElement.addEventListener('pointerdown', function(event) {
+        if (event.button !== undefined && event.button !== 0) return;
+        var screenToSvg = svg.getScreenCTM();
+        if (!screenToSvg) return;
+        event.preventDefault();
+        wordElement.setPointerCapture(event.pointerId);
+        var start = svgPointFromEvent(svg, event);
+        dragState.dragging = true;
+        dragState.grabX = start.x - dragState.x;   /* keep the word under the cursor */
+        dragState.grabY = start.y - dragState.y;
+        dragState.lastX = start.x; dragState.lastY = start.y;
+        dragState.vx = 0; dragState.vy = 0;
+        wordElement.style.cursor = 'grabbing';
+      });
+      wordElement.addEventListener('pointermove', function(event) {
+        if (!dragState.dragging) return;
+        var now = svgPointFromEvent(svg, event);
+        dragState.vx = (now.x - dragState.lastX) * FLING_STRENGTH;
+        dragState.vy = (now.y - dragState.lastY) * FLING_STRENGTH;
+        dragState.lastX = now.x; dragState.lastY = now.y;
+        /* new offset = pointer position minus where we grabbed, kept inside the picture */
+        var homeX = wordPositions[wordIndex].baseX, homeY = wordPositions[wordIndex].baseY;
+        var targetX = Math.max(30, Math.min(SVG_WIDTH  - 30, homeX + now.x - dragState.grabX - dragState.x + dragState.x));
+        var targetY = Math.max(20, Math.min(SVG_HEIGHT - 20, homeY + now.y - dragState.grabY - dragState.y + dragState.y));
+        dragState.x = targetX - homeX;
+        dragState.y = targetY - homeY;
+      });
+      function releaseWord(event) {
+        if (!dragState.dragging) return;
+        dragState.dragging = false;
+        wordElement.style.cursor = 'pointer';
+        try { wordElement.releasePointerCapture(event.pointerId); } catch (e) {}
+      }
+      wordElement.addEventListener('pointerup', releaseWord);
+      wordElement.addEventListener('pointercancel', releaseWord);
 
       svg.appendChild(wordElement);
 
@@ -1399,8 +1465,27 @@ function startWordFloatAnimation() {
         var floatY        = Math.cos(wi * 2.3) * 4.2;
         var cycleDuration = 3200 + (wi % 5) * 550;
         var cycleAngle    = ((timestamp / cycleDuration) + wi * 0.6) % 1 * Math.PI * 2;
-        wordEl.setAttribute('x', pos.baseX + Math.sin(cycleAngle) * floatX);
-        wordEl.setAttribute('y', pos.baseY + Math.cos(cycleAngle) * floatY);
+        /* spring physics: pull the dragged offset back toward 0 with a bounce */
+        var drag = getDragState(ci, wi);
+        if (!drag.dragging) {
+          drag.vx = (drag.vx - drag.x * SPRING_STIFFNESS) * SPRING_DAMPING;
+          drag.vy = (drag.vy - drag.y * SPRING_STIFFNESS) * SPRING_DAMPING;
+          drag.x += drag.vx;
+          drag.y += drag.vy;
+          if (Math.abs(drag.x) < 0.05 && Math.abs(drag.y) < 0.05 && Math.abs(drag.vx) < 0.05 && Math.abs(drag.vy) < 0.05) {
+            drag.x = 0; drag.y = 0; drag.vx = 0; drag.vy = 0;
+          }
+        }
+        var wordX = pos.baseX + Math.sin(cycleAngle) * floatX + drag.x;
+        var wordY = pos.baseY + Math.cos(cycleAngle) * floatY + drag.y;
+        wordEl.setAttribute('x', wordX);
+        wordEl.setAttribute('y', wordY);
+        /* the line from the center follows the word while it is moved */
+        if (drag.x !== 0 || drag.y !== 0 || drag.wasMoved) {
+          var lineEl = document.getElementById('cluster-line-' + ci + '-' + wi);
+          if (lineEl) { lineEl.setAttribute('x2', wordX); lineEl.setAttribute('y2', wordY); }
+          drag.wasMoved = (drag.x !== 0 || drag.y !== 0);
+        }
       }
     }
     floatAnimationHandle = requestAnimationFrame(animationTick);
