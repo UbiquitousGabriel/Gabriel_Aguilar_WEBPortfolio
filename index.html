@@ -3,8 +3,54 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#060606"/>
+<script>
+/* Apply the saved day/night choice before the page paints (no flash). */
+try { if (localStorage.getItem('portfolio-theme') === 'light') document.documentElement.setAttribute('data-theme','light'); } catch (e) {}
+</script>
 <title>Gabriel Aguilar</title>
 <style>
+/* ============================================================
+   COLOR PALETTE  (matches the Digital Business Card)
+   Change a color here and the whole site follows.
+   --ink-rgb is the same color as --ink written as R, G, B so
+   we can make see-through versions: rgba(var(--ink-rgb), 0.3)
+============================================================ */
+:root {
+  color-scheme: dark;
+  --bg:          #060606;            /* page background (near-black)        */
+  --bg-raised:   #0e0e0e;            /* tiles, panels, popup                 */
+  --placeholder: #171512;            /* empty image boxes (the X boxes)      */
+  --ink:         #ede0c4;            /* main text: warm champagne            */
+  --ink-rgb:     237, 224, 196;      /* same as --ink, for transparent uses  */
+  --ink-name:    #f2ede4;            /* names and titles: warm white         */
+  --ph-line:     #3a352c;            /* X-box diagonal lines                 */
+  --ph-frame:    #2a2620;            /* X-box border                         */
+  --bar:         rgba(6,6,6,0.92);   /* nav bar and popup backdrop           */
+  --shadow:      rgba(0,0,0,0.65);   /* tile hover shadow                    */
+  --curve-rgb:   237, 224, 196;      /* background Bezier curve color        */
+}
+
+/* ------------------------------------------------------------
+   DAY MODE  (the sepia-tinted black-on-white look)
+   Applied when <html data-theme="light">. The toggle button in
+   the bottom-left corner switches it. Edit these to retune.
+------------------------------------------------------------ */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg:          #f3ecdd;            /* warm paper white                     */
+  --bg-raised:   #faf5ea;
+  --placeholder: #e8e0cd;
+  --ink:         #140e07;            /* warm sepia black                     */
+  --ink-rgb:     20, 14, 7;
+  --ink-name:    #0f0b06;
+  --ph-line:     #c4b89c;
+  --ph-frame:    #d3c8ae;
+  --bar:         rgba(243,236,221,0.92);
+  --shadow:      rgba(70,50,20,0.28);
+  --curve-rgb:   70, 52, 28;
+}
+
 
 /* ============================================================
    RESET & BASE
@@ -12,7 +58,7 @@
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html, body {
   width:100%; min-height:100%;
-  background:#fff; color:#000;
+  background:var(--bg); color:var(--ink);
   font-family:"Times New Roman",Times,serif;
   overflow-x:hidden;
 }
@@ -27,17 +73,17 @@ button { cursor:pointer; font-family:inherit; }
   position:fixed; top:0; left:0; right:0; z-index:999;
   height:60px; display:flex; align-items:center; justify-content:space-between;
   padding:0 52px;
-  background:rgba(255,255,255,0.95); backdrop-filter:blur(12px);
-  border-bottom:1px solid rgba(0,0,0,0.08);
+  background:var(--bar); backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(var(--ink-rgb),0.08);
 }
-.navbar-logo { font-size:11px; letter-spacing:0.24em; cursor:pointer; user-select:none; }
-.navbar-links { display:flex; gap:36px; }
+.navbar-logo { font-size:13px; color:var(--ink-name); letter-spacing:0.24em; cursor:pointer; user-select:none; }
+.navbar-links { display:flex; gap:36px; align-items:center; }
 .navbar-button {
   background:none; border:none; border-bottom:1px solid transparent;
-  font-size:10px; letter-spacing:0.18em; color:#000; padding:3px 0;
-  opacity:0.35; transition:opacity 0.25s, border-color 0.25s;
+  font-size:12px; letter-spacing:0.18em; color:var(--ink); padding:3px 0;
+  opacity:0.6; transition:opacity 0.25s, border-color 0.25s;
 }
-.navbar-button.is-active { opacity:1; border-bottom:1px solid #000; }
+.navbar-button.is-active { opacity:1; border-bottom:1px solid var(--ink); }
 
 /* ============================================================
    PAGE SYSTEM
@@ -75,40 +121,49 @@ button { cursor:pointer; font-family:inherit; }
 }
 .home-photo-box {
   width:175px; height:235px;
-  border:1px solid rgba(0,0,0,0.14);
+  border:1px solid rgba(var(--ink-rgb),0.14);
   display:flex; align-items:center; justify-content:center;
-  background:rgba(0,0,0,0.016);
+  background:rgba(var(--ink-rgb),0.03);
 }
 .home-photo-box span { font-size:9px; letter-spacing:0.2em; opacity:0.22; }
-.home-photo-caption { font-size:9px; letter-spacing:0.1em; opacity:0.38; margin-top:9px; }
+.home-photo-caption { font-size:12px; letter-spacing:0.1em; opacity:0.65; margin-top:10px; }
+.home-headshot { border:1px solid rgba(var(--ink-rgb),0.15); border-radius:3px; }
 .home-bio-column { padding-top:4px; }
-.home-bio-text { font-size:16.5px; line-height:1.92; margin:0 0 42px; max-width:500px; letter-spacing:0.01em; }
-.home-contact-label { font-size:8.5px; letter-spacing:0.24em; opacity:0.34; margin:0 0 8px; }
-.home-contact-link { display:block; font-size:13px; opacity:0.7; margin-bottom:5px; letter-spacing:0.04em; }
+.home-bio-text { font-size:20px; line-height:1.92; margin:0 0 42px; max-width:500px; letter-spacing:0.01em; }
+.home-contact-label { font-size:11px; letter-spacing:0.24em; opacity:0.6; margin:0 0 8px; }
+.home-contact-link { display:block; font-size:16px; opacity:0.85; margin-bottom:5px; letter-spacing:0.04em; transition:opacity 0.25s; }
+.home-contact-link:hover { opacity:1; }
 .home-divider-line {
-  height:1px; background:rgba(0,0,0,0.1); margin-bottom:24px;
+  height:1px; background:rgba(var(--ink-rgb),0.1); margin-bottom:24px;
   transform:scaleX(0); transform-origin:left;
   transition:transform 1.1s cubic-bezier(0.22,1,0.36,1);
 }
 .home-divider-line.is-revealed { transform:scaleX(1); }
 .home-discipline-tags { display:flex; gap:28px; }
-.home-discipline-tags span { font-size:9.5px; letter-spacing:0.22em; opacity:0.3; }
+.home-tag {
+  /* Film / Theater / Creative Technology — real buttons now (click to jump to that cluster) */
+  background:none; border:none; border-bottom:1px solid transparent;
+  font-family:inherit; font-size:14px; letter-spacing:0.22em;
+  color:var(--ink); opacity:0.7; padding:8px 0; cursor:pointer;
+  transition:opacity 0.25s, border-color 0.25s;
+}
+.home-tag:hover, .home-tag:focus-visible { opacity:1; border-bottom-color:var(--ink); outline:none; }
 
 /* ============================================================
    WORK PAGE
 ============================================================ */
 .work-page {
-  position:relative; z-index:1; background:#fff;
+  position:relative; z-index:1; background:transparent;
   display:flex; flex-direction:column; align-items:center;
   padding:48px 20px 280px;
 }
 .cluster-navigation { display:flex; align-items:center; gap:22px; margin-bottom:8px; }
 .cluster-arrow-button {
   background:none; border:none; font-size:24px; line-height:1;
-  color:#000; opacity:0.38; padding:4px 14px; transition:opacity 0.2s;
+  color:var(--ink); opacity:0.6; padding:4px 14px; transition:opacity 0.2s;
 }
 .cluster-arrow-button:hover { opacity:0.9; }
-.cluster-page-counter { font-size:9px; letter-spacing:0.22em; opacity:0.3; min-width:60px; text-align:center; }
+.cluster-page-counter { font-size:11px; letter-spacing:0.22em; opacity:0.7; min-width:60px; text-align:center; }
 .cluster-viewport {
   position:relative; width:100%; max-width:720px;
   height:560px; overflow:hidden;
@@ -127,10 +182,10 @@ button { cursor:pointer; font-family:inherit; }
 .cluster-dot-row { display:flex; gap:10px; margin-top:12px; }
 .cluster-dot {
   width:7px; height:7px; border-radius:50%;
-  border:1px solid #000; background:transparent; padding:0; transition:background 0.3s;
+  border:1px solid var(--ink); background:transparent; padding:0; transition:background 0.3s;
 }
-.cluster-dot.is-active { background:#000; }
-.cluster-hint-text { font-size:8.5px; letter-spacing:0.18em; opacity:0.24; margin-top:12px; }
+.cluster-dot.is-active { background:var(--ink); }
+.cluster-hint-text { font-size:11px; letter-spacing:0.18em; opacity:0.62; margin-top:12px; }
 
 /* ============================================================
    SKILL DETAIL PANEL
@@ -139,7 +194,7 @@ button { cursor:pointer; font-family:inherit; }
 ============================================================ */
 .skill-detail-panel {
   position:fixed; bottom:0; left:0; right:0; z-index:500;
-  background:#fff; border-top:1px solid rgba(0,0,0,0.1);
+  background:var(--bg-raised); border-top:1px solid rgba(var(--ink-rgb),0.12);
   padding:24px 52px 28px;
   transform:translateY(100%);
   transition:transform 0.38s cubic-bezier(0.22,1,0.36,1);
@@ -152,16 +207,16 @@ button { cursor:pointer; font-family:inherit; }
   max-width:860px; margin:0 auto;
   display:grid; grid-template-columns:200px 1fr; gap:40px; align-items:start;
 }
-.skill-panel-name { font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; margin-bottom:8px; }
-.skill-panel-summary { font-size:12px; line-height:1.7; opacity:0.55; font-style:italic; }
+.skill-panel-name { color:var(--ink-name); font-size:14px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; margin-bottom:8px; }
+.skill-panel-summary { font-size:14px; line-height:1.7; opacity:0.75; font-style:italic; }
 .skill-panel-bullet-list { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:1fr 1fr; gap:6px 32px; }
-.skill-panel-bullet-list li { font-size:12px; line-height:1.68; opacity:0.72; padding-left:16px; position:relative; }
+.skill-panel-bullet-list li { font-size:14px; line-height:1.68; opacity:0.88; padding-left:16px; position:relative; }
 .skill-panel-bullet-list li::before { content:'--'; position:absolute; left:0; font-size:10px; opacity:0.4; }
 .skill-panel-close-button {
   position:absolute; top:14px; right:20px;
-  background:none; border:none; font-size:13px; opacity:0.3; color:#000; transition:opacity 0.2s;
+  background:none; border:none; font-size:16px; opacity:0.7; color:var(--ink); transition:opacity 0.2s;
 }
-.skill-panel-close-button:hover { opacity:0.8; }
+.skill-panel-close-button:hover { opacity:1; }
 
 /* ============================================================
    PORTFOLIO PAGE
@@ -170,14 +225,14 @@ button { cursor:pointer; font-family:inherit; }
   position:relative; z-index:1;
   padding:44px 48px 100px; max-width:1200px; margin:0 auto;
 }
-.portfolio-section-label { font-size:9px; letter-spacing:0.24em; opacity:0.32; text-transform:uppercase; margin-bottom:40px; }
+.portfolio-section-label { font-size:12px; letter-spacing:0.24em; opacity:0.6; text-transform:uppercase; margin-bottom:40px; }
 .project-grid {
   display:grid; grid-template-columns:repeat(3,1fr);
   gap:3px; align-items:start;
 }
 .project-tile {
-  position:relative; cursor:pointer; background:#fff;
-  border:1px solid rgba(0,0,0,0.08);
+  position:relative; cursor:pointer; background:var(--bg-raised);
+  border:1px solid rgba(var(--ink-rgb),0.08);
   opacity:0; transform:translateY(18px);
   transition:opacity 0.55s cubic-bezier(0.22,1,0.36,1),
              transform 0.55s cubic-bezier(0.22,1,0.36,1),
@@ -185,53 +240,54 @@ button { cursor:pointer; font-family:inherit; }
   z-index:1;
 }
 .project-tile.is-revealed { opacity:1; transform:translateY(0); }
-.project-tile:hover { border-color:rgba(0,0,0,0.2); box-shadow:0 8px 40px rgba(0,0,0,0.09); z-index:10; }
+.project-tile:hover { border-color:rgba(var(--ink-rgb),0.4); box-shadow:0 8px 40px var(--shadow); z-index:10; }
+.project-tile:focus-visible { outline:1px solid var(--ink); outline-offset:3px; }
 .project-thumbnail-wrapper { width:100%; overflow:hidden; }
 .project-thumbnail {
-  position:relative; width:100%; padding-top:72%; background:#ececec;
+  position:relative; width:100%; padding-top:72%; background:var(--placeholder);
   transition:padding-top 0.42s cubic-bezier(0.22,1,0.36,1);
 }
 .project-tile:hover .project-thumbnail { padding-top:86%; }
 .project-thumbnail svg { position:absolute; inset:0; width:100%; height:100%; }
 .project-resting-strip {
-  padding:13px 18px 15px; border-top:1px solid rgba(0,0,0,0.06);
+  padding:13px 18px 15px; border-top:1px solid rgba(var(--ink-rgb),0.06);
   overflow:hidden; max-height:80px;
   transition:max-height 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.25s, padding 0.3s;
 }
 .project-tile:hover .project-resting-strip { max-height:0; opacity:0; padding-top:0; padding-bottom:0; }
-.resting-strip-category { font-size:8px; letter-spacing:0.2em; opacity:0.3; text-transform:uppercase; margin-bottom:4px; }
-.resting-strip-title { font-size:13px; font-weight:700; }
+.resting-strip-category { font-size:11px; letter-spacing:0.2em; opacity:0.6; text-transform:uppercase; margin-bottom:4px; }
+.resting-strip-title { font-size:15px; font-weight:700; color:var(--ink-name); }
 .project-info-panel {
   max-height:0; overflow:hidden; opacity:0;
   border-top:1px solid transparent;
   transition:max-height 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.35s, border-color 0.3s;
 }
-.project-tile:hover .project-info-panel { max-height:300px; opacity:1; border-top:1px solid rgba(0,0,0,0.07); }
+.project-tile:hover .project-info-panel { max-height:300px; opacity:1; border-top:1px solid rgba(var(--ink-rgb),0.07); }
 .project-info-inner { padding:16px 20px 20px; }
-.project-info-category { font-size:8px; letter-spacing:0.22em; opacity:0.32; text-transform:uppercase; margin-bottom:6px; }
-.project-info-title { font-size:14px; font-weight:700; letter-spacing:0.01em; margin-bottom:9px; }
-.project-info-description { font-size:11.5px; line-height:1.72; opacity:0.58; margin-bottom:16px; }
+.project-info-category { font-size:11px; letter-spacing:0.22em; opacity:0.6; text-transform:uppercase; margin-bottom:6px; }
+.project-info-title { color:var(--ink-name); font-size:17px; font-weight:700; letter-spacing:0.01em; margin-bottom:9px; }
+.project-info-description { font-size:14px; line-height:1.72; opacity:0.78; margin-bottom:16px; }
 .project-view-button {
   display:inline-block; background:none;
-  border:1px solid rgba(0,0,0,0.28);
+  border:1px solid rgba(var(--ink-rgb),0.28);
   font-family:"Times New Roman",Times,serif;
-  font-size:9px; letter-spacing:0.18em; color:#000; padding:7px 16px;
+  font-size:11px; letter-spacing:0.18em; color:var(--ink); padding:9px 18px;
   transition:background 0.2s, color 0.2s, border-color 0.2s; cursor:pointer;
 }
-.project-view-button:hover { background:#000; color:#fff; border-color:#000; }
+.project-view-button:hover { background:var(--ink); color:var(--bg); border-color:var(--ink); }
 
 /* ============================================================
    LIGHTBOX
 ============================================================ */
 .lightbox-overlay {
   position:fixed; inset:0; z-index:9999;
-  background:rgba(255,255,255,0.92); backdrop-filter:blur(10px);
+  background:var(--bar); backdrop-filter:blur(10px);
   display:flex; align-items:center; justify-content:center; padding:24px;
   opacity:0; pointer-events:none; transition:opacity 0.28s;
 }
 .lightbox-overlay.is-open { opacity:1; pointer-events:all; }
 .lightbox-box {
-  background:#fff; border:1px solid rgba(0,0,0,0.12);
+  background:var(--bg-raised); border:1px solid rgba(var(--ink-rgb),0.12);
   max-width:840px; width:100%; position:relative;
   max-height:90vh; overflow-y:auto;
   transform:scale(0.97) translateY(14px);
@@ -240,19 +296,19 @@ button { cursor:pointer; font-family:inherit; }
 .lightbox-overlay.is-open .lightbox-box { transform:scale(1) translateY(0); }
 .lightbox-close-button {
   position:absolute; top:14px; right:16px;
-  background:none; border:none; font-size:14px; opacity:0.3; color:#000; z-index:10; transition:opacity 0.2s;
+  background:none; border:none; font-size:18px; opacity:0.7; color:var(--ink); z-index:10; transition:opacity 0.2s;
 }
-.lightbox-close-button:hover { opacity:0.8; }
-.lightbox-header { padding:36px 40px 24px; border-bottom:1px solid rgba(0,0,0,0.07); }
-.lightbox-category { font-size:8px; letter-spacing:0.24em; opacity:0.3; text-transform:uppercase; margin-bottom:8px; }
-.lightbox-title { font-size:22px; font-weight:700; letter-spacing:0.02em; margin-bottom:10px; }
-.lightbox-description { font-size:14px; line-height:1.84; opacity:0.68; }
+.lightbox-close-button:hover { opacity:1; }
+.lightbox-header { padding:36px 40px 24px; border-bottom:1px solid rgba(var(--ink-rgb),0.07); }
+.lightbox-category { font-size:11px; letter-spacing:0.24em; opacity:0.6; text-transform:uppercase; margin-bottom:8px; }
+.lightbox-title { color:var(--ink-name); font-size:26px; font-weight:700; letter-spacing:0.02em; margin-bottom:10px; }
+.lightbox-description { font-size:16px; line-height:1.84; opacity:0.85; }
 .lightbox-image-grid { display:grid; grid-template-columns:1fr 1fr; gap:3px; padding:3px; }
-.lightbox-image-slot { padding-top:66%; position:relative; background:#ececec; }
+.lightbox-image-slot { padding-top:66%; position:relative; background:var(--placeholder); }
 .lightbox-image-slot svg { position:absolute; inset:0; width:100%; height:100%; }
 .lightbox-footer-note {
-  padding:24px 40px 32px; font-size:11px; opacity:0.32;
-  line-height:1.76; font-style:italic; border-top:1px solid rgba(0,0,0,0.07);
+  padding:24px 40px 32px; font-size:13px; opacity:0.7;
+  line-height:1.76; font-style:italic; border-top:1px solid rgba(var(--ink-rgb),0.07);
 }
 
 /* ============================================================
@@ -260,7 +316,10 @@ button { cursor:pointer; font-family:inherit; }
 ============================================================ */
 @media (max-width:900px) { .project-grid { grid-template-columns:repeat(2,1fr); } }
 @media (max-width:640px) {
-  .navbar { padding:0 24px; }
+  .navbar { padding:0 16px; }
+  .navbar-logo { display:none; }
+  .navbar-links { gap:16px; width:100%; justify-content:space-between; }
+  .navbar-button { font-size:11px; letter-spacing:0.1em; }
   .home-page { padding:50px 24px 60px; }
   .home-layout { grid-template-columns:1fr; gap:28px; }
   .portfolio-page { padding:40px 20px 80px; }
@@ -272,12 +331,28 @@ button { cursor:pointer; font-family:inherit; }
   .skill-panel-bullet-list { grid-template-columns:1fr; }
 }
 
+
+/* ============================================================
+   DAY / NIGHT TOGGLE  (live Bezier-curve button, left of "ABOUT")
+   A tiny version of the animated Bezier flower from the Digital
+   Business Card, drawn on a <canvas>. Click it to switch modes.
+============================================================ */
+.theme-toggle {
+  width:46px; height:46px; padding:0; margin:0 -6px 0 0;
+  background:none; border:none; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0.9; transition:opacity 0.2s, transform 0.3s;
+}
+.theme-toggle canvas { width:46px; height:46px; display:block; }
+.theme-toggle:hover, .theme-toggle:focus-visible { opacity:1; transform:scale(1.18); outline:none; }
+body, .navbar, .project-tile, #skill-detail-panel { transition:background-color 0.3s, color 0.3s; }
 </style>
 </head>
 <body>
 
 <!-- BACKGROUND CANVAS: animated bezier curves, hidden on Work page -->
 <canvas class="background-canvas" id="background-canvas"></canvas>
+
 
 <!-- ============================================================
      NAVIGATION BAR
@@ -286,6 +361,10 @@ button { cursor:pointer; font-family:inherit; }
 <nav class="navbar">
   <span class="navbar-logo" onclick="showPage('home')">G. AGUILAR</span>
   <div class="navbar-links">
+    <!-- Day / night toggle: the live Bezier flower, shrunk into a button -->
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch between night and day mode" title="Day / night">
+      <canvas id="theme-toggle-canvas" width="46" height="46"></canvas>
+    </button>
     <button class="navbar-button is-active" id="nav-home"      onclick="showPage('home')">ABOUT</button>
     <button class="navbar-button"           id="nav-work"      onclick="showPage('work')">EXPERIENCE</button>
     <button class="navbar-button"           id="nav-portfolio" onclick="showPage('portfolio')">PORTFOLIO</button>
@@ -302,7 +381,7 @@ button { cursor:pointer; font-family:inherit; }
       <!-- Left: Photo -->
       <!-- TO CUSTOMIZE: Replace the div below with an img tag pointing to your photo -->
       <div>
-       <img src="assets/images/Gabriel_Headshot.jpg" alt="Gabriel Aguilar" style="width:175px;height:235px;object-fit:cover;display:block;" />
+       <img class="home-headshot" src="assets/images/Gabriel_Headshot.jpg" alt="Gabriel Aguilar" style="width:175px;height:235px;object-fit:cover;display:block;" />
         <p class="home-photo-caption">Gabriel Aguilar</p>
       </div>
 
@@ -323,11 +402,13 @@ button { cursor:pointer; font-family:inherit; }
     </div>
     <!-- Animated divider line -->
     <div class="home-divider-line" id="home-divider-line"></div>
-    <!-- TO CUSTOMIZE: Add or remove discipline tags -->
+    <!-- TO CUSTOMIZE: These are buttons. openExperience(N) jumps to the Nth
+         cluster on the Experience page: 0 = first cluster, 1 = second, 2 = third.
+         Change the number if you reorder the clusters in ALL_CLUSTERS. -->
     <div class="home-discipline-tags">
-      <span>Film</span>
-      <span>Theater</span>
-      <span>Creative Technology</span>
+      <button class="home-tag" onclick="openExperience(0)">Film</button>
+      <button class="home-tag" onclick="openExperience(1)">Theater</button>
+      <button class="home-tag" onclick="openExperience(2)">Creative Technology</button>
     </div>
   </div>
 </div>
@@ -399,6 +480,18 @@ button { cursor:pointer; font-family:inherit; }
 </div>
 
 <script>
+/* ============================================================
+   JS COLORS  (the CSS variables at the top of <style> can't be
+   used inside SVG attributes, so the same palette lives here.
+   Keep these in sync with --ink / --bg-raised / --placeholder.)
+============================================================ */
+var INK_COLOR         = 'var(--ink)';   /* champagne text and lines   */
+var INK_NAME_COLOR    = 'var(--ink-name)';   /* names / big center labels  */
+var PANEL_COLOR       = 'var(--bg-raised)';   /* tooltip background         */
+var PLACEHOLDER_FILL  = 'var(--placeholder)';   /* X-box background           */
+var PLACEHOLDER_LINE  = 'var(--ph-line)';   /* X-box diagonal lines       */
+var PLACEHOLDER_FRAME = 'var(--ph-frame)';   /* X-box border               */
+
 /* ============================================================
    LOREM IPSUM PLACEHOLDER TEXT
    Replace these with your real experience bullet points.
@@ -899,7 +992,7 @@ function initializeBackgroundCurves() {
       vcx0: randomVelocity(0.22), vcy0: randomVelocity(0.22),
       vcx1: randomVelocity(0.22), vcy1: randomVelocity(0.22),
       vx1: randomVelocity(0.3),   vy1: randomVelocity(0.3),
-      alpha: 0.038 + Math.random() * 0.042
+      alpha: 0.07 + Math.random() * 0.09
     });
   }
 }
@@ -927,11 +1020,106 @@ function drawBackgroundFrame() {
     bgContext.beginPath();
     bgContext.moveTo(c.x0, c.y0);
     bgContext.bezierCurveTo(c.cx0, c.cy0, c.cx1, c.cy1, c.x1, c.y1);
-    bgContext.strokeStyle = 'rgba(0,0,0,' + c.alpha + ')';
+    bgContext.strokeStyle = 'rgba(' + curveColorRGB + ',' + c.alpha + ')';
     bgContext.lineWidth = 0.85;
     bgContext.stroke();
   }
   requestAnimationFrame(drawBackgroundFrame);
+}
+
+/* Curve color comes from the --curve-rgb CSS variable (changes with day/night mode). */
+var curveColorRGB = '237,224,196';
+function refreshCurveColor() {
+  var v = getComputedStyle(document.documentElement).getPropertyValue('--curve-rgb').trim();
+  if (v) curveColorRGB = v;
+}
+
+/* ---- Day / night toggle ---- */
+function setTheme(mode) {
+  if (mode === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  else document.documentElement.removeAttribute('data-theme');
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', mode === 'light' ? '#f3ecdd' : '#060606');
+  try { localStorage.setItem('portfolio-theme', mode); } catch (e) {}
+  refreshCurveColor();
+}
+/* ---- Live Bezier flower button ----
+   Same algorithm as the Digital Business Card (3 rings of curves that
+   wobble and breathe), scaled down to fit a 46px canvas.
+   TO TWEAK: RINGS (count/size/opacity), TOGGLE_SIZE, or line widths. */
+(function () {
+  var TOGGLE_SIZE = 46;
+  var toggleCanvas = document.getElementById('theme-toggle-canvas');
+  var dpr = window.devicePixelRatio || 1;
+  toggleCanvas.width = TOGGLE_SIZE * dpr; toggleCanvas.height = TOGGLE_SIZE * dpr;
+  var tctx = toggleCanvas.getContext('2d');
+  tctx.scale(dpr, dpr);
+  var cx = TOGGLE_SIZE / 2, cy = TOGGLE_SIZE / 2, R = TOGGLE_SIZE * 0.32;
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var RINGS = [
+    { n:13, rm:1.0,  hue:32, alpha:0.72, spd:1.0,  lw:0.9 },
+    { n:10, rm:0.70, hue:20, alpha:0.45, spd:0.65, lw:0.75 },
+    { n:16, rm:1.30, hue:44, alpha:0.32, spd:1.35, lw:0.6 }
+  ];
+  var ringData = RINGS.map(function (ring, si) {
+    var arr = [];
+    for (var i = 0; i < ring.n; i++) arr.push({
+      baseAngle:(i / ring.n) * Math.PI * 2, phase:si * 2.1 + i * 0.47, ps:0.28 + (i % 3) * 0.09,
+      wa:0.07 + (i % 4) * 0.025, cp1p:si * 2.1 + i * 0.91, cp2p:si * 2.1 + i * 1.37,
+      cs:0.22 + (i % 5) * 0.06, cp1r:0.35, cp1t:0.35, cp2r:0.35, cp2t:0.35 });
+    return arr;
+  });
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function pt(a, r) { return { x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r }; }
+
+  function drawToggleFrame(ts) {
+    var t = reduceMotion ? 3 : ts * 0.001;
+    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    var sat = isLight ? 45 : 30, lightness = isLight ? 24 : 80, dotLight = isLight ? 18 : 88;
+    var boost = isLight ? 1.25 : 1;
+    tctx.clearRect(0, 0, TOGGLE_SIZE, TOGGLE_SIZE);
+    RINGS.forEach(function (ring, ri) {
+      var curves = ringData[ri], radius = R * ring.rm;
+      curves.forEach(function (c, i) {
+        if (Math.random() < 0.003) c.cp1t = 0.12 + Math.random() * 0.6;
+        if (Math.random() < 0.003) c.cp2t = 0.12 + Math.random() * 0.6;
+        c.cp1r = lerp(c.cp1r, c.cp1t, 0.007); c.cp2r = lerp(c.cp2r, c.cp2t, 0.007);
+        var nx = curves[(i + 1) % ring.n];
+        var a1 = c.baseAngle  + Math.sin(t * c.ps  * ring.spd + c.phase)  * c.wa;
+        var a2 = nx.baseAngle + Math.sin(t * nx.ps * ring.spd + nx.phase) * nx.wa;
+        var p1 = pt(a1, radius), p2 = pt(a2, radius);
+        var cp1 = pt(a1 + Math.sin(t * c.cs * ring.spd + c.cp1p) * 1.1, radius * c.cp1r);
+        var cp2 = pt(a2 + Math.sin(t * c.cs * ring.spd + c.cp2p) * 1.1, radius * c.cp2r);
+        var al = Math.min(1, ring.alpha * boost * (0.55 + 0.45 * Math.sin(t * 0.5 * ring.spd + c.phase)));
+        tctx.beginPath(); tctx.moveTo(p1.x, p1.y);
+        tctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y);
+        tctx.strokeStyle = 'hsla(' + ring.hue + ',' + sat + '%,' + lightness + '%,' + (al * 0.18) + ')';
+        tctx.lineWidth = ring.lw * 3.5; tctx.lineCap = 'round'; tctx.stroke();
+        tctx.beginPath(); tctx.moveTo(p1.x, p1.y);
+        tctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, p2.x, p2.y);
+        tctx.strokeStyle = 'hsla(' + ring.hue + ',' + sat + '%,' + lightness + '%,' + al + ')';
+        tctx.lineWidth = ring.lw; tctx.stroke();
+        tctx.beginPath(); tctx.arc(p1.x, p1.y, 0.7, 0, Math.PI * 2);
+        tctx.fillStyle = 'hsla(' + ring.hue + ',45%,' + dotLight + '%,' + (al * 0.8) + ')'; tctx.fill();
+      });
+    });
+    if (!reduceMotion) requestAnimationFrame(drawToggleFrame);
+  }
+  requestAnimationFrame(drawToggleFrame);
+  /* with reduced motion the flower is still; redraw once after a switch */
+  if (reduceMotion) document.getElementById('theme-toggle').addEventListener('click', function () {
+    setTimeout(function () { requestAnimationFrame(drawToggleFrame); }, 30);
+  });
+})();
+
+document.getElementById('theme-toggle').addEventListener('click', function () {
+  setTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+});
+refreshCurveColor();
+if (document.documentElement.getAttribute('data-theme') === 'light') {
+  var themeMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeMeta) themeMeta.setAttribute('content', '#f3ecdd');
 }
 
 resizeBackgroundCanvas();
@@ -951,7 +1139,31 @@ var SVG_WIDTH    = 660;
 var SVG_HEIGHT   = 540;
 var SVG_CENTER_X = SVG_WIDTH  / 2;
 var SVG_CENTER_Y = SVG_HEIGHT / 2;
-var ORBIT_RADIUS = 195;
+var ORBIT_RADIUS = 225;   /* was 195. Wider ring gives larger words room. */
+
+/* ------------------------------------------------------------
+   SKILL WORD SIZES (Work page)
+   BASE_WORD_SIZE  = size of every orbiting skill word.
+   FEATURED_SKILLS = skills that render larger. The key must match
+   the skill's  t:  value in ALL_CLUSTERS exactly (case and spacing).
+   A name that matches nothing is silently ignored, so if you rename
+   a skill, rename it here too. A skill that appears in two clusters
+   (e.g. "Directing") is enlarged in both.
+------------------------------------------------------------ */
+var BASE_WORD_SIZE = 13;
+var FEATURED_SKILLS = {
+  /* Video */
+  "Video Editing":       17,
+  "Directing":           17,
+  /* Theater */
+  "Video Engineering":   17,
+  "Technical Directing": 17,
+  "Lighting Design":     16,
+  /* Creative Technology */
+  "Projection Mapping":  17,
+  "Unity":               16,
+  "Object Tracking":     16
+};
 var SVG_NS       = 'http://www.w3.org/2000/svg';
 
 var storedWordPositions  = []; /* base positions per cluster, used by float animation */
@@ -971,7 +1183,7 @@ function calculateWordPositions(wordList) {
   for (var i = 0; i < wordList.length; i++) {
     var angle   = (i / wordList.length) * Math.PI * 2 - Math.PI / 2;
     var radiusX = ORBIT_RADIUS + jitterTable[i % jitterTable.length];
-    var radiusY = radiusX * 0.68;
+    var radiusY = radiusX * 0.74;   /* was 0.68. Taller ellipse so top/bottom words don't collide. */
     positions.push({
       baseX: SVG_CENTER_X + radiusX * Math.cos(angle),
       baseY: SVG_CENTER_Y + radiusY * Math.sin(angle)
@@ -999,9 +1211,9 @@ function buildClusterSVG(clusterData, clusterIndex) {
     line.setAttribute('y1', SVG_CENTER_Y);
     line.setAttribute('x2', wordPositions[li].baseX);
     line.setAttribute('y2', wordPositions[li].baseY);
-    line.setAttribute('stroke', '#000');
+    line.style.stroke = INK_COLOR;
     line.setAttribute('stroke-width', '0.6');
-    line.setAttribute('stroke-opacity', '0.1');
+    line.setAttribute('stroke-opacity', '0.18');
     line.id = 'cluster-line-' + clusterIndex + '-' + li;
     svg.appendChild(line);
   }
@@ -1016,15 +1228,15 @@ function buildClusterSVG(clusterData, clusterIndex) {
   tooltipBg.setAttribute('width', '204');
   tooltipBg.setAttribute('height', '26');
   tooltipBg.setAttribute('rx', '1');
-  tooltipBg.setAttribute('fill', '#fff');
-  tooltipBg.setAttribute('stroke', '#000');
+  tooltipBg.style.fill = PANEL_COLOR;
+  tooltipBg.style.stroke = INK_COLOR;
   tooltipBg.setAttribute('stroke-width', '0.5');
   tooltipBg.setAttribute('stroke-opacity', '0.36');
 
   var tooltipLabel = document.createElementNS(SVG_NS, 'text');
   tooltipLabel.setAttribute('text-anchor', 'middle');
   tooltipLabel.setAttribute('dominant-baseline', 'middle');
-  tooltipLabel.style.cssText = 'font-family:"Times New Roman",serif;font-size:9.5px;fill:#000;';
+  tooltipLabel.style.cssText = 'font-family:"Times New Roman",serif;font-size:9.5px;fill:' + INK_COLOR + ';';
 
   tooltipGroup.appendChild(tooltipBg);
   tooltipGroup.appendChild(tooltipLabel);
@@ -1038,9 +1250,10 @@ function buildClusterSVG(clusterData, clusterIndex) {
       wordElement.setAttribute('y', position.baseY);
       wordElement.setAttribute('text-anchor', 'middle');
       wordElement.setAttribute('dominant-baseline', 'middle');
+      var wordFontSize = FEATURED_SKILLS[wordData.t] || BASE_WORD_SIZE;
       wordElement.style.cssText =
-        'font-family:"Times New Roman",serif;font-size:11px;fill:#000;' +
-        'opacity:0.56;cursor:pointer;user-select:none;transition:opacity 0.2s;';
+        'font-family:"Times New Roman",serif;font-size:' + wordFontSize + 'px;fill:' + INK_COLOR + ';' +
+        'opacity:0.72;cursor:pointer;user-select:none;transition:opacity 0.2s;';
       wordElement.textContent = wordData.t;
       wordElement.id = 'cluster-word-' + clusterIndex + '-' + wordIndex;
 
@@ -1051,7 +1264,7 @@ function buildClusterSVG(clusterData, clusterIndex) {
 
         /* Highlight its connection line */
         var connectionLine = document.getElementById('cluster-line-' + clusterIndex + '-' + wordIndex);
-        if (connectionLine) connectionLine.setAttribute('stroke-opacity', '0.32');
+        if (connectionLine) connectionLine.setAttribute('stroke-opacity', '0.55');
 
         /* Position the SVG tooltip above or below the word */
         var isInBottomHalf = position.baseY > SVG_HEIGHT * 0.5;
@@ -1070,10 +1283,10 @@ function buildClusterSVG(clusterData, clusterIndex) {
       });
 
       wordElement.addEventListener('mouseleave', function() {
-        wordElement.style.opacity    = '0.56';
+        wordElement.style.opacity    = '0.72';
         wordElement.style.fontWeight = '400';
         var connectionLine = document.getElementById('cluster-line-' + clusterIndex + '-' + wordIndex);
-        if (connectionLine) connectionLine.setAttribute('stroke-opacity', '0.1');
+        if (connectionLine) connectionLine.setAttribute('stroke-opacity', '0.18');
         tooltipGroup.style.display = 'none';
         /* Small delay so fast mouse movements don't flash the panel shut */
         skillPanelCloseTimer = setTimeout(closeSkillPanel, 280);
@@ -1096,7 +1309,7 @@ function buildClusterSVG(clusterData, clusterIndex) {
   centerLabel.style.cssText =
     'font-family:"Times New Roman",serif;' +
     'font-size:' + clusterData.labelFontSize + 'px;' +
-    'font-weight:700;fill:#000;letter-spacing:0.1em;' +
+    'font-weight:700;fill:' + INK_NAME_COLOR + ';letter-spacing:0.1em;' +
     'user-select:none;cursor:pointer;';
   centerLabel.textContent = clusterData.label;
 
@@ -1118,8 +1331,8 @@ function buildClusterSVG(clusterData, clusterIndex) {
   resumeHint.setAttribute('y', SVG_CENTER_Y + clusterData.labelFontSize * 0.85 + 6);
   resumeHint.setAttribute('text-anchor', 'middle');
   resumeHint.style.cssText =
-    'font-family:"Times New Roman",serif;font-size:8px;fill:#000;' +
-    'opacity:0.26;letter-spacing:0.16em;pointer-events:none;';
+    'font-family:"Times New Roman",serif;font-size:10px;fill:' + INK_COLOR + ';' +
+    'opacity:0.7;letter-spacing:0.16em;pointer-events:none;';
   resumeHint.textContent = 'VIEW RESUME';
   svg.appendChild(resumeHint);
 
@@ -1235,6 +1448,16 @@ function goToCluster(nextIndex) {
     String(ALL_CLUSTERS.length).padStart(2, '0');
 }
 
+/*
+  Called by the Film / Theater / Creative Technology tags on the home page.
+  Switches to the Experience page, then slides to the chosen cluster.
+  clusterIndex: 0 = first cluster in ALL_CLUSTERS, 1 = second, 2 = third.
+*/
+function openExperience(clusterIndex) {
+  showPage('work');
+  goToCluster(clusterIndex);
+}
+
 /* Called by arrow buttons. direction is -1 (prev) or 1 (next) */
 function navigateCluster(direction) {
   var nextIndex = (activeClusterIndex + direction + ALL_CLUSTERS.length) % ALL_CLUSTERS.length;
@@ -1274,10 +1497,10 @@ var portfolioIsBuilt = false;
 /* Returns an SVG string showing a grey placeholder image with an X */
 function makePlaceholderSVG() {
   return '<svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">' +
-    '<rect width="100" height="100" fill="#ebebeb"/>' +
-    '<line x1="0" y1="0" x2="100" y2="100" stroke="#c0c0c0" stroke-width="0.8"/>' +
-    '<line x1="100" y1="0" x2="0" y2="100" stroke="#c0c0c0" stroke-width="0.8"/>' +
-    '<rect x="0" y="0" width="100" height="100" fill="none" stroke="#d0d0d0" stroke-width="0.5"/>' +
+    '<rect width="100" height="100" style="fill:' + PLACEHOLDER_FILL + '"/>' +
+    '<line x1="0" y1="0" x2="100" y2="100" style="stroke:' + PLACEHOLDER_LINE + '" stroke-width="0.8"/>' +
+    '<line x1="100" y1="0" x2="0" y2="100" style="stroke:' + PLACEHOLDER_LINE + '" stroke-width="0.8"/>' +
+    '<rect x="0" y="0" width="100" height="100" style="fill:none;stroke:' + PLACEHOLDER_FRAME + '" stroke-width="0.5"/>' +
     '</svg>';
 }
 
@@ -1313,10 +1536,21 @@ function buildPortfolioPage() {
           '</div>' +
         '</div>';
 
-      /* Wire up the View Images button */
-      tile.querySelector('.project-view-button').addEventListener('click', function(event) {
-        event.stopPropagation();
+      /* Clicking ANYWHERE on the tile (picture, title, text, or the
+         VIEW IMAGES button) opens the popup. The button is now just a
+         visual hint; the click bubbles up to the tile. The tile also
+         works from the keyboard (Tab to it, press Enter or Space). */
+      tile.setAttribute('tabindex', '0');
+      tile.setAttribute('role', 'button');
+      tile.setAttribute('aria-label', 'View images for ' + projectData.title);
+      tile.addEventListener('click', function() {
         openLightbox(projectData);
+      });
+      tile.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openLightbox(projectData);
+        }
       });
 
       grid.appendChild(tile);

@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gabriel Aguilar</title>
+<style>
+
+/* ============================================================
+   RESET & BASE
+============================================================ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  width:100%; min-height:100%;
+  background:#fff; color:#000;
+  font-family:"Times New Roman",Times,serif;
+  overflow-x:hidden;
+}
+a { color:inherit; text-decoration:none; }
+button { cursor:pointer; font-family:inherit; }
+
+/* ============================================================
+   NAVIGATION BAR
+   Fixed to top. Active button gets an underline.
+============================================================ */
+.navbar {
+  position:fixed; top:0; left:0; right:0; z-index:999;
+  height:60px; display:flex; align-items:center; justify-content:space-between;
+  padding:0 52px;
+  background:rgba(255,255,255,0.95); backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(0,0,0,0.08);
+}
+.navbar-logo { font-size:11px; letter-spacing:0.24em; cursor:pointer; user-select:none; }
+.navbar-links { display:flex; gap:36px; }
+.navbar-button {
+  background:none; border:none; border-bottom:1px solid transparent;
+  font-size:10px; letter-spacing:0.18em; color:#000; padding:3px 0;
+  opacity:0.35; transition:opacity 0.25s, border-color 0.25s;
+}
+.navbar-button.is-active { opacity:1; border-bottom:1px solid #000; }
+
+/* ============================================================
+   PAGE SYSTEM
+   Only one .page is visible at a time.
+   Pages are display:none unless they have .is-visible.
+   This is the entire routing system — no bleed between pages.
+============================================================ */
+.page {
+  display:none;
+  position:relative;
+  min-height:calc(100vh - 60px);
+  margin-top:60px;
+}
+.page.is-visible { display:block; }
+
+/* ============================================================
+   GENERATIVE BACKGROUND CANVAS
+   Behind everything on Home and Portfolio. Hidden on Work.
+============================================================ */
+.background-canvas {
+  position:fixed; inset:0; width:100%; height:100%;
+  pointer-events:none; z-index:0; transition:opacity 0.4s;
+}
+
+/* ============================================================
+   HOME PAGE
+============================================================ */
+.home-page {
+  position:relative; z-index:1;
+  padding:60px 52px 80px; max-width:920px; margin:0 auto;
+}
+.home-layout {
+  display:grid; grid-template-columns:185px 1fr;
+  gap:60px; margin-bottom:52px; align-items:start;
+}
+.home-photo-box {
+  width:175px; height:235px;
+  border:1px solid rgba(0,0,0,0.14);
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,0.016);
+}
+.home-photo-box span { font-size:9px; letter-spacing:0.2em; opacity:0.22; }
+.home-photo-caption { font-size:9px; letter-spacing:0.1em; opacity:0.38; margin-top:9px; }
+.home-bio-column { padding-top:4px; }
+.home-bio-text { font-size:16.5px; line-height:1.92; margin:0 0 42px; max-width:500px; letter-spacing:0.01em; }
+.home-contact-label { font-size:8.5px; letter-spacing:0.24em; opacity:0.34; margin:0 0 8px; }
+.home-contact-link { display:block; font-size:13px; opacity:0.7; margin-bottom:5px; letter-spacing:0.04em; }
+.home-divider-line {
+  height:1px; background:rgba(0,0,0,0.1); margin-bottom:24px;
+  transform:scaleX(0); transform-origin:left;
+  transition:transform 1.1s cubic-bezier(0.22,1,0.36,1);
+}
+.home-divider-line.is-revealed { transform:scaleX(1); }
+.home-discipline-tags { display:flex; gap:28px; }
+.home-discipline-tags span { font-size:9.5px; letter-spacing:0.22em; opacity:0.3; }
+
+/* ============================================================
+   WORK PAGE
+============================================================ */
+.work-page {
+  position:relative; z-index:1; background:#fff;
+  display:flex; flex-direction:column; align-items:center;
+  padding:48px 20px 280px;
+}
+.cluster-navigation { display:flex; align-items:center; gap:22px; margin-bottom:8px; }
+.cluster-arrow-button {
+  background:none; border:none; font-size:24px; line-height:1;
+  color:#000; opacity:0.38; padding:4px 14px; transition:opacity 0.2s;
+}
+.cluster-arrow-button:hover { opacity:0.9; }
+.cluster-page-counter { font-size:9px; letter-spacing:0.22em; opacity:0.3; min-width:60px; text-align:center; }
+.cluster-viewport {
+  position:relative; width:100%; max-width:720px;
+  height:560px; overflow:hidden;
+}
+.cluster-slide {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; transform:translateX(80px);
+  transition:opacity 0.5s cubic-bezier(0.22,1,0.36,1), transform 0.5s cubic-bezier(0.22,1,0.36,1);
+  pointer-events:none;
+}
+.cluster-slide.is-active { opacity:1; transform:translateX(0); pointer-events:all; }
+.cluster-slide.is-exiting-left  { opacity:0; transform:translateX(-80px); pointer-events:none; }
+.cluster-slide.is-exiting-right { opacity:0; transform:translateX(80px);  pointer-events:none; }
+.cluster-slide svg { width:100%; height:100%; overflow:visible; display:block; }
+.cluster-dot-row { display:flex; gap:10px; margin-top:12px; }
+.cluster-dot {
+  width:7px; height:7px; border-radius:50%;
+  border:1px solid #000; background:transparent; padding:0; transition:background 0.3s;
+}
+.cluster-dot.is-active { background:#000; }
+.cluster-hint-text { font-size:8.5px; letter-spacing:0.18em; opacity:0.24; margin-top:12px; }
+
+/* ============================================================
+   SKILL DETAIL PANEL
+   Fixed to bottom of screen.
+   display:none unless Work page is active (toggled by showPage).
+============================================================ */
+.skill-detail-panel {
+  position:fixed; bottom:0; left:0; right:0; z-index:500;
+  background:#fff; border-top:1px solid rgba(0,0,0,0.1);
+  padding:24px 52px 28px;
+  transform:translateY(100%);
+  transition:transform 0.38s cubic-bezier(0.22,1,0.36,1);
+  pointer-events:none;
+  max-height:38vh; overflow-y:auto;
+}
+.skill-detail-panel.is-open { transform:translateY(0); pointer-events:all; }
+.skill-detail-panel.is-hidden { display:none; }
+.skill-panel-layout {
+  max-width:860px; margin:0 auto;
+  display:grid; grid-template-columns:200px 1fr; gap:40px; align-items:start;
+}
+.skill-panel-name { font-size:11px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; margin-bottom:8px; }
+.skill-panel-summary { font-size:12px; line-height:1.7; opacity:0.55; font-style:italic; }
+.skill-panel-bullet-list { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:1fr 1fr; gap:6px 32px; }
+.skill-panel-bullet-list li { font-size:12px; line-height:1.68; opacity:0.72; padding-left:16px; position:relative; }
+.skill-panel-bullet-list li::before { content:'--'; position:absolute; left:0; font-size:10px; opacity:0.4; }
+.skill-panel-close-button {
+  position:absolute; top:14px; right:20px;
+  background:none; border:none; font-size:13px; opacity:0.3; color:#000; transition:opacity 0.2s;
+}
+.skill-panel-close-button:hover { opacity:0.8; }
+
+/* ============================================================
+   PORTFOLIO PAGE
+============================================================ */
+.portfolio-page {
+  position:relative; z-index:1;
+  padding:44px 48px 100px; max-width:1200px; margin:0 auto;
+}
+.portfolio-section-label { font-size:9px; letter-spacing:0.24em; opacity:0.32; text-transform:uppercase; margin-bottom:40px; }
+.project-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:3px; align-items:start;
+}
+.project-tile {
+  position:relative; cursor:pointer; background:#fff;
+  border:1px solid rgba(0,0,0,0.08);
+  opacity:0; transform:translateY(18px);
+  transition:opacity 0.55s cubic-bezier(0.22,1,0.36,1),
+             transform 0.55s cubic-bezier(0.22,1,0.36,1),
+             border-color 0.25s, box-shadow 0.35s cubic-bezier(0.22,1,0.36,1);
+  z-index:1;
+}
+.project-tile.is-revealed { opacity:1; transform:translateY(0); }
+.project-tile:hover { border-color:rgba(0,0,0,0.2); box-shadow:0 8px 40px rgba(0,0,0,0.09); z-index:10; }
+.project-thumbnail-wrapper { width:100%; overflow:hidden; }
+.project-thumbnail {
+  position:relative; width:100%; padding-top:72%; background:#ececec;
+  transition:padding-top 0.42s cubic-bezier(0.22,1,0.36,1);
+}
+.project-tile:hover .project-thumbnail { padding-top:86%; }
+.project-thumbnail svg { position:absolute; inset:0; width:100%; height:100%; }
+.project-resting-strip {
+  padding:13px 18px 15px; border-top:1px solid rgba(0,0,0,0.06);
+  overflow:hidden; max-height:80px;
+  transition:max-height 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.25s, padding 0.3s;
+}
+.project-tile:hover .project-resting-strip { max-height:0; opacity:0; padding-top:0; padding-bottom:0; }
+.resting-strip-category { font-size:8px; letter-spacing:0.2em; opacity:0.3; text-transform:uppercase; margin-bottom:4px; }
+.resting-strip-title { font-size:13px; font-weight:700; }
+.project-info-panel {
+  max-height:0; overflow:hidden; opacity:0;
+  border-top:1px solid transparent;
+  transition:max-height 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.35s, border-color 0.3s;
+}
+.project-tile:hover .project-info-panel { max-height:300px; opacity:1; border-top:1px solid rgba(0,0,0,0.07); }
+.project-info-inner { padding:16px 20px 20px; }
+.project-info-category { font-size:8px; letter-spacing:0.22em; opacity:0.32; text-transform:uppercase; margin-bottom:6px; }
+.project-info-title { font-size:14px; font-weight:700; letter-spacing:0.01em; margin-bottom:9px; }
+.project-info-description { font-size:11.5px; line-height:1.72; opacity:0.58; margin-bottom:16px; }
+.project-view-button {
+  display:inline-block; background:none;
+  border:1px solid rgba(0,0,0,0.28);
+  font-family:"Times New Roman",Times,serif;
+  font-size:9px; letter-spacing:0.18em; color:#000; padding:7px 16px;
+  transition:background 0.2s, color 0.2s, border-color 0.2s; cursor:pointer;
+}
+.project-view-button:hover { background:#000; color:#fff; border-color:#000; }
+
+/* ============================================================
+   LIGHTBOX
+============================================================ */
+.lightbox-overlay {
+  position:fixed; inset:0; z-index:9999;
+  background:rgba(255,255,255,0.92); backdrop-filter:blur(10px);
+  display:flex; align-items:center; justify-content:center; padding:24px;
+  opacity:0; pointer-events:none; transition:opacity 0.28s;
+}
+.lightbox-overlay.is-open { opacity:1; pointer-events:all; }
+.lightbox-box {
+  background:#fff; border:1px solid rgba(0,0,0,0.12);
+  max-width:840px; width:100%; position:relative;
+  max-height:90vh; overflow-y:auto;
+  transform:scale(0.97) translateY(14px);
+  transition:transform 0.36s cubic-bezier(0.22,1,0.36,1);
+}
+.lightbox-overlay.is-open .lightbox-box { transform:scale(1) translateY(0); }
+.lightbox-close-button {
+  position:absolute; top:14px; right:16px;
+  background:none; border:none; font-size:14px; opacity:0.3; color:#000; z-index:10; transition:opacity 0.2s;
+}
+.lightbox-close-button:hover { opacity:0.8; }
+.lightbox-header { padding:36px 40px 24px; border-bottom:1px solid rgba(0,0,0,0.07); }
+.lightbox-category { font-size:8px; letter-spacing:0.24em; opacity:0.3; text-transform:uppercase; margin-bottom:8px; }
+.lightbox-title { font-size:22px; font-weight:700; letter-spacing:0.02em; margin-bottom:10px; }
+.lightbox-description { font-size:14px; line-height:1.84; opacity:0.68; }
+.lightbox-image-grid { display:grid; grid-template-columns:1fr 1fr; gap:3px; padding:3px; }
+.lightbox-image-slot { padding-top:66%; position:relative; background:#ececec; }
+.lightbox-image-slot svg { position:absolute; inset:0; width:100%; height:100%; }
+.lightbox-footer-note {
+  padding:24px 40px 32px; font-size:11px; opacity:0.32;
+  line-height:1.76; font-style:italic; border-top:1px solid rgba(0,0,0,0.07);
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width:900px) { .project-grid { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:640px) {
+  .navbar { padding:0 24px; }
+  .home-page { padding:50px 24px 60px; }
+  .home-layout { grid-template-columns:1fr; gap:28px; }
+  .portfolio-page { padding:40px 20px 80px; }
+  .project-grid { grid-template-columns:1fr; }
+  .work-page { padding:40px 12px 260px; }
+  .cluster-viewport { height:480px; }
+  .skill-detail-panel { padding:20px 24px 24px; }
+  .skill-panel-layout { grid-template-columns:1fr; gap:16px; }
+  .skill-panel-bullet-list { grid-template-columns:1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND CANVAS: animated bezier curves, hidden on Work page -->
+<canvas class="background-canvas" id="background-canvas"></canvas>
+
+<!-- ============================================================
+     NAVIGATION BAR
+     Each button calls showPage() with its page name.
+============================================================ -->
+<nav class="navbar">
+  <span class="navbar-logo" onclick="showPage('home')">G. AGUILAR</span>
+  <div class="navbar-links">
+    <button class="navbar-button is-active" id="nav-home"      onclick="showPage('home')">ABOUT</button>
+    <button class="navbar-button"           id="nav-work"      onclick="showPage('work')">EXPERIENCE</button>
+    <button class="navbar-button"           id="nav-portfolio" onclick="showPage('portfolio')">PORTFOLIO</button>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HOME PAGE (visible by default on load)
+============================================================ -->
+<div class="page is-visible" id="page-home">
+  <div class="home-page">
+    <div class="home-layout">
+
+      <!-- Left: Photo -->
+      <!-- TO CUSTOMIZE: Replace the div below with an img tag pointing to your photo -->
+      <div>
+       <img src="assets/images/Gabriel_Headshot.jpg" alt="Gabriel Aguilar" style="width:175px;height:235px;object-fit:cover;display:block;" />
+        <p class="home-photo-caption">Gabriel Aguilar</p>
+      </div>
+
+      <!-- Right: Bio and contact -->
+      <div class="home-bio-column">
+        <!-- TO CUSTOMIZE: Edit bio text here -->
+        <p class="home-bio-text">
+          Gabriel Aguilar is a highly motivated art worker with a diverse skill set in video,
+          live event production, and emergent media technology. Seeking to contribute to
+          innovative projects in a creative technology role.
+        </p>
+        <p class="home-contact-label">CONTACT</p>
+        <!-- TO CUSTOMIZE: Update phone number and email address -->
+        <a class="home-contact-link" href="tel:7174228560">(717) 422-8560</a>
+        <a class="home-contact-link" href="mailto:gaaguilarfilm@gmail.com">gaaguilarfilm@gmail.com</a>
+      </div>
+
+    </div>
+    <!-- Animated divider line -->
+    <div class="home-divider-line" id="home-divider-line"></div>
+    <!-- TO CUSTOMIZE: Add or remove discipline tags -->
+    <div class="home-discipline-tags">
+      <span>Film</span>
+      <span>Theater</span>
+      <span>Creative Technology</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     WORK PAGE (hidden until WORK button is clicked)
+============================================================ -->
+<div class="page" id="page-work">
+  <div class="work-page">
+    <div class="cluster-navigation">
+      <button class="cluster-arrow-button" onclick="navigateCluster(-1)">&#8592;</button>
+      <span class="cluster-page-counter" id="cluster-page-counter">01 / 03</span>
+      <button class="cluster-arrow-button" onclick="navigateCluster(1)">&#8594;</button>
+    </div>
+    <!-- SVG cluster slides injected here by buildWorkPage() -->
+    <div class="cluster-viewport" id="cluster-viewport"></div>
+    <!-- Dot indicators injected here by buildWorkPage() -->
+    <div class="cluster-dot-row" id="cluster-dot-row"></div>
+    <p class="cluster-hint-text">Hover a skill for details &middot; Click the main word to view r&eacute;sum&eacute;</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     PORTFOLIO PAGE (hidden until PORTFOLIO button is clicked)
+============================================================ -->
+<div class="page" id="page-portfolio">
+  <div class="portfolio-page">
+    <p class="portfolio-section-label">Selected Work</p>
+    <!-- Project tiles injected here by buildPortfolioPage() -->
+    <div class="project-grid" id="project-grid"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SKILL DETAIL PANEL
+     Fixed to bottom of screen.
+     Starts with .is-hidden (display:none).
+     showPage() removes .is-hidden only when Work is active.
+============================================================ -->
+<div class="skill-detail-panel is-hidden" id="skill-detail-panel">
+  <button class="skill-panel-close-button" onclick="closeSkillPanel()">&#10005;</button>
+  <div class="skill-panel-layout">
+    <div>
+      <p class="skill-panel-name"    id="skill-panel-name"></p>
+      <p class="skill-panel-summary" id="skill-panel-summary"></p>
+    </div>
+    <ul class="skill-panel-bullet-list" id="skill-panel-bullets"></ul>
+  </div>
+</div>
+
+<!-- ============================================================
+     IMAGE LIGHTBOX
+     Always in DOM but invisible until openLightbox() is called.
+============================================================ -->
+<div class="lightbox-overlay" id="lightbox-overlay" onclick="closeLightbox()">
+  <div class="lightbox-box" onclick="event.stopPropagation()">
+    <button class="lightbox-close-button" onclick="closeLightbox()">&#10005;</button>
+    <div class="lightbox-header">
+      <p class="lightbox-category"    id="lightbox-category"></p>
+      <h2 class="lightbox-title"      id="lightbox-title"></h2>
+      <p class="lightbox-description" id="lightbox-description"></p>
+    </div>
+    <!-- Image slots injected here by openLightbox() -->
+    <div class="lightbox-image-grid" id="lightbox-image-grid"></div>
+    <p class="lightbox-footer-note">
+      Additional images, video documentation, and project notes will appear here once content is added.
+    </p>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   LOREM IPSUM PLACEHOLDER TEXT
+   Replace these with your real experience bullet points.
+   Each string is one bullet point in the skill detail panel.
+============================================================ */
+var LOREM_BULLETS = [
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.",
+  "Ut labore et dolore magna aliqua, ut enim ad minim veniam quis nostrud.",
+  "Exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+  "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.",
+  "Excepteur sint occaecat cupidatat non proident, sunt in culpa officia.",
+  "Deserunt mollit anim id est laborum et dolore magna aliqua consequat.",
+];
+
+/* Returns the first N lorem bullet strings as a new array */
+function getLoremBullets(numberOfBullets) {
+  return LOREM_BULLETS.slice(0, numberOfBullets);
+}
+
+/* ============================================================
+   CLUSTER DATA
+   TO CUSTOMIZE:
+   - label: the big center word shown in the SVG
+   - labelFontSize: reduce if label is very long
+   - resumeFile: path to your PDF in assets/pdfs/
+   - words: array of skill words that orbit the center
+     - t: the word shown in the SVG
+     - summary: one-line description shown in the panel
+     - bullets: array of experience lines (replace lorem ipsum)
+============================================================ */
+var ALL_CLUSTERS = [
+  {
+    label: "VIDEO",
+    labelFontSize: 28,
+    resumeFile: "assets/pdfs/Gabriel_Aguilar_Film_Resume.pdf",
+    words: [
+      {
+        t: "Video Editing",
+        summary: "Non-linear post-production editing for narrative, commercial, and branded content.",
+        bullets: [
+          "Edited branded content for Johnson & Johnson's Live Healthy Live Well internal campaign at MCM Creative",
+          "Cut promotional content for The Princess Grace Foundation, Mount Sinai Hospital, and Schulte Roth & Zabel",
+          "Edited event video for The Moth Project and promotional content for GRIT Boxing",
+          "Directed and edited award-winning short film I Have A Confidence Issue — Best Film, Youth Arts Exhibition",
+        ]
+      },
+      {
+        t: "Digital Imaging",
+        summary: "On-set and in-post image management including color pipeline setup.",
+        bullets: [
+          "Operated video playback, projection, and camera systems at The Public Theater across multiple productions",
+          "Managed camera feed routing and live imaging for hybrid theatrical livestream (Circle Jerk, Fake Friends LLC)",
+          "Managed file mannagement, dailies, and data prtoection while on shoots with MCM Creative",
+        ]
+      },
+      {
+        t: "Directing",
+        summary: "Short-form narrative direction for film and multimedia projects.",
+        bullets: [
+          "Directed and wrote I Have A Confidence Issue — won Best Film at the Youth Arts Exhibition",
+          "Directed Neon Noir, a multimedia performance piece, at CASA",
+          "Developed 2.5D surreal narrative game concept with full character and environment direction",
+        ]
+      },
+      {
+        t: "Asst. Camera",
+        summary: "Camera department support including systems management and live operation.",
+        bullets: [
+          "Assisted with the camera department on multiple shoots at MCM Creative",
+          "Operated and maintained camera systems at The Public Theater for live theatrical productions",
+          "Managed multi-camera systems and live feed routing for Circle Jerk hybrid livestream",
+          "Contributed to camera rig design as promoted AVE on Circle Jerk within two days of load-in",
+          
+        ]
+      },
+      {
+        t: "Electrics",
+        summary: "On-set and in-venue electrical setup for film and live production.",
+        bullets: [
+          "Worked across multiple shoot supporting the lighting departments for film projects while freelance",
+          "Worked as Theater Electrician at MITU 580 (Feb 2024 & Jun 2025) — installation, load-in, strike",
+          "Managed circuit distribution and DMX addressing for lighting systems at Camp Chen-A-Wanda",
+          "Supported electrical and lighting setup across freelance gigs at The Connelly and The Public",
+        ]
+      },
+      {
+        t: "Set Design",
+        summary: "Designing and dressing production environments for performance and film.",
+        bullets: [
+          "Contributed to environmental and spatial design for Neon Noir multimedia production at CASA",
+          "Sourced, fabricated, and maintained props for I'm Still Here (Imaginarium Theater Company, The Tank)",
+        ]
+      },
+      {
+        t: "DSLR Photography",
+        summary: "Still and motion photography with DSLR and mirrorless camera systems.",
+        bullets: [
+          "DSLR cinematography across narrative and commercial projects at MCM Creative",
+          "Used DSLR systems in production documentation and content capture for branded client work",
+          "Applied photography skills to visual development for portfolio and personal projects",
+        ]
+      },
+      {
+        t: "Color Correction",
+        summary: "Primary and secondary color correction across post-production workflows.",
+        bullets: [
+          "Applied color correction to all MCM Creative client deliverables including J&J and Princess Grace Foundation content",
+          "Used both DaVinci Resolve and Premiere Pro color tools across 4 years of professional editing",
+          "Developed eye for color consistency across multi-clip branded and narrative projects",
+        ]
+      },
+      {
+        t: "Voice Over",
+        summary: "Audio direction and production including voice and sound editorial.",
+        bullets: [
+          "Managed audio input and sound editing across post-production work at MCM Creative",
+          "Coordinated audio with performance and pyrotechnic timing as Sound Engineer for Camp Chen-A-Wanda Annual Fireworks Display",
+          "Applied sound editing skills to narrative and commercial video projects",
+        ]
+      },
+    ]
+  },
+
+  {
+    label: "THEATER",
+    labelFontSize: 26,
+    resumeFile: "assets/pdfs/Gabriel_Aguilar_Theater_Resume.pdf",
+    words: [
+      {
+        t: "Writing",
+        summary: "Original writing for theater, film, and interactive narrative.",
+        bullets: [
+          "Wrote and directed I Have A Confidence Issue — awarded Best Film at Youth Arts Exhibition",
+          "Wrote Mankind (in development) — a theater piece following cavemen constructing society and culture",
+          "Wrote cryoCommunist Play (in development) — set in a frozen communist alien society with class system dynamics",
+          "Co-developing The One True World, a novel series following two protagonists in a fantasy war-torn world",
+        ]
+      },
+      {
+        t: "Directing",
+        summary: "Stage and screen direction spanning theater, multimedia, and devised work.",
+        bullets: [
+          "Directed Neon Noir, a multimedia performance piece, at CASA",
+          "Directed and wrote I Have A Confidence Issue — Best Film, Youth Arts Exhibition",
+          "Directed all technical aspects of youth theater productions as Technical Director at Camp Chen-A-Wanda (2021–Present)",
+          "Developing Cruise de Carnivore — a virtual XR play where users follow individual passengers through a wartime cruise ship narrative",
+        ]
+      },
+      {
+        t: "Acting",
+        summary: "Trained performer with 6 years of acting training and musical theater credits.",
+        bullets: [
+          "Berger in Hair — Weary Arts Group",
+          "Seymour in Little Shop of Horrors — Stuart Landon",
+          "Oscar Lindquist in Sweet Charity — Stuart Landon",
+          "Danny in Grease — Allenberry Playhouse",
+          "Lewis in Pippin — CASA",
+          "6 years acting training at Aalsedek Theatre School; 3 years voice training with David Glasgow",
+        ]
+      },
+      {
+        t: "Stage Design",
+        summary: "Scenic and spatial design for theatrical and immersive productions.",
+        bullets: [
+          "Designed environments for Neon Noir multimedia production at CASA",
+          "Developed PORTALS installation series — portal frames housing virtual tableaus mounted into architectural surfaces",
+          "Conceptualized Witching Hour installation — multi-screen witch trial simulation with sound and heating elements",
+          "Designed immersive spatial layouts for youth theater at Camp Chen-A-Wanda",
+        ]
+      },
+      {
+        t: "Lighting Design",
+        summary: "Theatrical lighting design, programming, and systems operation.",
+        bullets: [
+          "Lighting Designer for youth theater productions at Camp Chen-A-Wanda, Shield's Theater (2021–Present)",
+          "DMX addressing, circuit distribution, and lighting programming across freelance gigs",
+          "Theater Electrician at MITU 580 (Feb 2024 & Jun 2025) — installation and maintenance of theatrical lighting systems",
+          "Supported lighting assembly and rigging at The Connelly and The Public Theater",
+        ]
+      },
+      {
+        t: "Stage Management",
+        summary: "Full production coordination from rehearsal to run.",
+        bullets: [
+          "ASM on A Play Titled After the Collective Noun for Female-Identifying 20-Somethings Living in NYC in the 2010s — Corkscrew Theater Festival",
+          "ASM on A Real Boy — Ivy Theater Company, 59E59",
+          "Managed rehearsal schedules, props tracking, and blocking documentation",
+          "Communicated key load-in and setup details to run crew across multiple freelance productions",
+        ]
+      },
+      {
+        t: "Board Operation",
+        summary: "Live operation of lighting and sound consoles during performance.",
+        bullets: [
+          "Operated lighting and sound systems for live youth theater productions at Camp Chen-A-Wanda",
+          "Managed live sound for Camp Chen-A-Wanda Annual Fireworks Display — coordinating audio with pyrotechnic timing",
+          "Operated video playback and projection systems live at The Public Theater across multiple productions",
+        ]
+      },
+      {
+        t: "Video Engineering",
+        summary: "Live video systems design and operation in theatrical contexts.",
+        bullets: [
+          "Video Technician at The Public Theater — video, projection, closed-captioning, and playback systems (May 2023–Present)",
+          "Assistant Video Engineer on Circle Jerk — managed camera systems, video routing, and live broadcast sync (Fake Friends LLC, The Connelly)",
+          "Promoted to AVE on Circle Jerk within two days; contributed to camera rig design",
+          "A/V Engineer on Comedy of Errors at The Public Theater",
+        ]
+      },
+      {
+        t: "Electrics",
+        summary: "Theatrical electrical rigging, installation, and fixture maintenance.",
+        bullets: [
+          "Theater Electrician at MITU 580 via Jacqueline Scaletta (Feb 2024 & Jun 2025)",
+          "Managed circuit distribution, DMX addressing, and signal termination across freelance gigs",
+          "Supported electrical installation and strike at The Connelly, The Public, and Corkscrew Theater Festival",
+          "Maintained all lighting infrastructure for youth theater at Camp Chen-A-Wanda",
+        ]
+      },
+      {
+        t: "Technical Directing",
+        summary: "Overseeing all technical departments and infrastructure for live productions.",
+        bullets: [
+          "Technical Director at Camp Chen-A-Wanda, Shield's Theater (2021–Present) — coordinates lighting, sound, rigging, and performance",
+          "Built Camp Chen-A-Wanda's A/V system from the ground up; modernized legacy infrastructure",
+          "Managed technical coordination across departments at The Connelly, The Public, and festival venues",
+          "Oversaw load-in, systems check, troubleshooting, and assembly for high-profile NYC theatrical productions",
+        ]
+      },
+      {
+        t: "Carpentry",
+        summary: "Scenic construction, props fabrication, and physical production.",
+        bullets: [
+          "Sourced, fabricated, and maintained props for I'm Still Here (Imaginarium Theater Company, The Tank)",
+          "Built custom control box and fabricated hardware for Peephole Shower physical computing installation",
+          "Physical construction and fabrication for PORTALS installation series",
+          "Hands-on assembly and rigging support across multiple theatrical load-ins",
+        ]
+      },
+      {
+        t: "Networking",
+        summary: "Technical networking for live production systems and real-time media.",
+        bullets: [
+          "Researched and presented on real-time networking for live events — TouchDesigner integration, latency modeling, data routing",
+          "Designed multi-streaming infrastructure for Theater LIVE! platform proposal — OBS, Restream.io, multi-platform broadcast architecture",
+          "Managed networked A/V systems and show networking across freelance theatrical productions",
+          "Studied protocol-based communication models for interactive performance systems at NYCCT",
+        ]
+      },
+    ]
+  },
+
+  {
+    label: "CREATIVE TECHNOLOGY",
+    labelFontSize: 17,
+    resumeFile: "assets/pdfs/Gabriel_Aguilar_CreativeTech_Resume.pdf",
+    words: [
+      {
+        t: "Projection Mapping",
+        summary: "Real-time projection onto surfaces and spatial environments.",
+        bullets: [
+          "Designed and deployed projection-mapping systems for theatrical productions as freelance A/V engineer (2020–Present)",
+          "Integrated projection mapping into live performance environments at The Public Theater",
+          "Applied projection design to immersive spatial storytelling across NYC theatrical contexts",
+          "Studied projection-mapped space as a core axis of immersive theater design at NYCCT",
+        ]
+      },
+      {
+        t: "Unity",
+        summary: "Real-time 3D development for interactive games and experiences.",
+        bullets: [
+          "Developing 2.5D surreal narrative game in Unity — multi-character structure, surreal environments, camera-driven gameplay",
+          "Using Unity for interactive experience design within BTech Emerging Media Technologies curriculum",
+          "Planned Unity integration for PORTALS virtual tableau installation series",
+          "Exploring Unity as engine for Cruise de Carnivore XR theatrical experience",
+        ]
+      },
+      {
+        t: "Unreal Engine",
+        summary: "High-fidelity rendering and virtual production environments.",
+        bullets: [
+          "Studied Unreal Engine for virtual production and interactive environment design at NYCCT",
+          "Explored Unreal as a platform for game engine-based theatrical experiences (context: Theater LIVE! future work research)",
+          "Applied Unreal Engine toolset within BTech Emerging Media Technologies curriculum",
+        ]
+      },
+      {
+        t: "Fabrication",
+        summary: "Physical prototyping, custom hardware, and mixed-media construction.",
+        bullets: [
+          "Built custom control box and fabricated physical interface for Peephole Shower Arduino installation",
+          "Fabricated portal frames for PORTALS installation series — LED screens mounted into architectural surfaces",
+          "Hands-on assembly and rigging across 5+ years of theatrical production work",
+          "Developing Decentralized Creative Laboratory concept — physical fabrication stations for hybrid digital/analog workflow",
+        ]
+      },
+      {
+        t: "Robotics",
+        summary: "Programmable motion and sensor-driven interactive systems.",
+        bullets: [
+          "Applied microcontroller programming (Arduino) in physical computing coursework and personal installations",
+          "Explored sensor-based and actuator-driven systems in NYCCT emerging media curriculum",
+          "Researching kinetic and responsive systems for installation work including Interactive Dance Video Display concept",
+        ]
+      },
+      {
+        t: "3D Printing",
+        summary: "Additive manufacturing for props, prototypes, and installation components.",
+        bullets: [
+          "Used 3D modeling and fabrication tools within BTech Emerging Media Technologies curriculum at NYCCT",
+          "Applied rapid prototyping methodology — a core skill area in the Emerging Media Technologies program",
+          "Exploring 3D printing for props and physical components in PORTALS and Decentralized Creative Laboratory projects",
+        ]
+      },
+      {
+        t: "CNC",
+        summary: "Computer-controlled fabrication for scenic and installation work.",
+        bullets: [
+          "Studied CNC and digital fabrication within NYCCT BTech curriculum",
+          "Applied fabrication methodology in system integration and rapid prototyping coursework",
+          "Considering CNC fabrication for physical elements of Decentralized Creative Laboratory and PORTALS installation series",
+        ]
+      },
+      {
+        t: "LiDAR",
+        summary: "Spatial scanning, depth sensing, and point-cloud capture.",
+        bullets: [
+          "Researching depth sensing cameras and spatial capture as part of computer vision R&D at NYCCT",
+          "Exploring LiDAR and depth sensor integration for camera-based interactive installation work",
+          "Point cloud visualization concepts applied to personal portfolio website work page design",
+          "Depth sensing is a listed skill on Creative Technology resume — active area of independent R&D",
+        ]
+      },
+      {
+        t: "Object Tracking",
+        summary: "Computer vision and real-time object recognition for interactive systems.",
+        bullets: [
+          "Active R&D in computer vision at NYCCT — exploring machine perception, camera-based interaction, AI-assisted environments",
+          "Researching object tracking for use in live performance contexts — bodies, props, and spatial triggers",
+          "Interactive Dance Video Display concept relies on real-time movement tracking to generate live visuals and music",
+          "Computer vision listed as a core skill; active research area with prototyping work ongoing",
+        ]
+      },
+      {
+        t: "HTML / CSS",
+        summary: "Front-end web development and interactive interface design.",
+        bullets: [
+          "Built personal portfolio website using HTML/CSS — deployed on GitHub Pages",
+          "Designed information architecture and front-end structure for portfolio and project pages",
+          "Developed Theater LIVE! platform architecture including full website page specifications for company-side and viewer-side interfaces",
+          "Designed Civic Pulse platform UI — feed layout, poll interface, data export views, and bias labeling system",
+        ]
+      },
+      {
+        t: "Python",
+        summary: "Scripting, automation, and data-driven creative applications.",
+        bullets: [
+          "Applied Python in computational media and systems coursework at NYCCT",
+          "Used scripting for data processing and automation within emerging media technology projects",
+          "Exploring Python for computer vision pipelines and AI-assisted interactive environment work",
+          "Applied in rapid prototyping and system integration coursework within BTech program",
+        ]
+      },
+      {
+        t: "JavaScript",
+        summary: "Interactive web development and creative coding.",
+        bullets: [
+          "Planned React-based front-end for personal portfolio including procedural Bezier curve generative background system",
+          "Designed Civic Pulse as a web-based platform — JavaScript underpins the feed, polling, and data export interfaces",
+          "Applied JavaScript concepts in front-end architecture for portfolio and platform design projects",
+          "Exploring generative and algorithmic visual systems in JavaScript for portfolio work page",
+        ]
+      },
+    ]
+  }
+];
+
+/* ============================================================
+   PORTFOLIO PROJECT DATA
+   TO CUSTOMIZE:
+   - title: project name
+   - category: Film / Theater / Creative Technology
+   - description: short paragraph about the project
+   - imageCount: how many placeholder slots in the lightbox
+   Replace lorem ipsum descriptions with real text when ready.
+============================================================ */
+var ALL_PROJECTS = [
+  { title: "Untitled Installation 01",    category: "Creative Technology", imageCount: 3,
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim." },
+  { title: "Untitled Installation 02",         category: "Film",                imageCount: 4,
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut labore et dolore magna aliqua, ut enim ad minim veniam quis nostrud exercitation." },
+  { title: "Untitled Installation 03",       category: "Theater",             imageCount: 2,
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute." },
+  { title: "Untitled Installation 04",  category: "Creative Technology", imageCount: 5,
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore." },
+  { title: "Untitled Installation 05",           category: "Film",                imageCount: 3,
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt." },
+  { title: "Untitled Installation 06",     category: "Creative Technology", imageCount: 4,
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Deserunt mollit anim id est laborum. Ut enim ad minim veniam quis nostrud." },
+  { title: "Untitled Installation 07",        category: "Theater",             imageCount: 2,
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium." },
+  { title: "Untitled Installation 08",          category: "Film",                imageCount: 3,
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit." },
+  { title: "Untitled Installation 09",     category: "Creative Technology", imageCount: 2,
+    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam." },
+];
+
+/* ============================================================
+   PAGE ROUTER
+   The single function that controls which page is visible.
+   Call showPage('home'), showPage('work'), or showPage('portfolio').
+
+   What it does:
+   1. Hides ALL pages (removes .is-visible from every .page div)
+   2. Shows ONLY the requested page (adds .is-visible to it)
+   3. Updates which nav button is underlined
+   4. Shows/hides the background canvas
+   5. Shows/hides the skill panel (Work page only)
+   6. Triggers any page-specific setup
+============================================================ */
+function showPage(pageName) {
+
+  /* Step 1: Hide every page */
+  var allPages = document.querySelectorAll('.page');
+  for (var i = 0; i < allPages.length; i++) {
+    allPages[i].classList.remove('is-visible');
+  }
+
+  /* Step 2: Show only the requested page */
+  document.getElementById('page-' + pageName).classList.add('is-visible');
+
+  /* Step 3: Update nav button states */
+  var allNavButtons = document.querySelectorAll('.navbar-button');
+  for (var j = 0; j < allNavButtons.length; j++) {
+    allNavButtons[j].classList.remove('is-active');
+  }
+  document.getElementById('nav-' + pageName).classList.add('is-active');
+
+  /* Step 4: Background canvas - visible everywhere except Work page */
+  var canvas = document.getElementById('background-canvas');
+  canvas.style.opacity = (pageName === 'work') ? '0' : '1';
+
+  /* Step 5: Skill panel - ONLY shown on Work page.
+     .is-hidden = display:none, so it is completely gone on other pages. */
+  var skillPanel = document.getElementById('skill-detail-panel');
+  if (pageName === 'work') {
+    skillPanel.classList.remove('is-hidden');
+  } else {
+    skillPanel.classList.remove('is-open');
+    skillPanel.classList.add('is-hidden');
+  }
+
+  /* Step 6: Page-specific setup */
+  if (pageName === 'home') {
+    setTimeout(function() {
+      document.getElementById('home-divider-line').classList.add('is-revealed');
+    }, 300);
+  }
+  if (pageName === 'portfolio') {
+    buildPortfolioPage();
+  }
+}
+
+/* ============================================================
+   GENERATIVE BEZIER BACKGROUND
+   Slowly drifting bezier curves drawn on a canvas.
+   TO CUSTOMIZE: Change numberOfCurves for more or fewer lines.
+   TO CUSTOMIZE: Change the alpha range (0.038 to 0.08) to make
+   lines more or less visible.
+============================================================ */
+var bgCanvas  = document.getElementById('background-canvas');
+var bgContext = bgCanvas.getContext('2d');
+var bgCurves  = [];
+var numberOfCurves = 14;
+
+function randomUpTo(max) { return Math.random() * max; }
+function randomVelocity(speed) { return (Math.random() - 0.5) * speed; }
+
+function bounceValue(value, velocity, min, max) {
+  var newValue = value + velocity;
+  if (newValue < min || newValue > max) {
+    velocity = -velocity;
+    newValue = Math.max(min, Math.min(max, newValue));
+  }
+  return [newValue, velocity];
+}
+
+function initializeBackgroundCurves() {
+  var w = bgCanvas.width, h = bgCanvas.height;
+  bgCurves = [];
+  for (var i = 0; i < numberOfCurves; i++) {
+    bgCurves.push({
+      x0: randomUpTo(w),  y0: randomUpTo(h),
+      cx0: randomUpTo(w), cy0: randomUpTo(h),
+      cx1: randomUpTo(w), cy1: randomUpTo(h),
+      x1: randomUpTo(w),  y1: randomUpTo(h),
+      vx0: randomVelocity(0.3),   vy0: randomVelocity(0.3),
+      vcx0: randomVelocity(0.22), vcy0: randomVelocity(0.22),
+      vcx1: randomVelocity(0.22), vcy1: randomVelocity(0.22),
+      vx1: randomVelocity(0.3),   vy1: randomVelocity(0.3),
+      alpha: 0.038 + Math.random() * 0.042
+    });
+  }
+}
+
+function resizeBackgroundCanvas() {
+  bgCanvas.width  = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+  initializeBackgroundCurves();
+}
+
+function drawBackgroundFrame() {
+  var w = bgCanvas.width, h = bgCanvas.height;
+  bgContext.clearRect(0, 0, w, h);
+  for (var i = 0; i < bgCurves.length; i++) {
+    var c = bgCurves[i];
+    var r;
+    r = bounceValue(c.x0,  c.vx0,  0, w); c.x0  = r[0]; c.vx0  = r[1];
+    r = bounceValue(c.y0,  c.vy0,  0, h); c.y0  = r[0]; c.vy0  = r[1];
+    r = bounceValue(c.cx0, c.vcx0, 0, w); c.cx0 = r[0]; c.vcx0 = r[1];
+    r = bounceValue(c.cy0, c.vcy0, 0, h); c.cy0 = r[0]; c.vcy0 = r[1];
+    r = bounceValue(c.cx1, c.vcx1, 0, w); c.cx1 = r[0]; c.vcx1 = r[1];
+    r = bounceValue(c.cy1, c.vcy1, 0, h); c.cy1 = r[0]; c.vcy1 = r[1];
+    r = bounceValue(c.x1,  c.vx1,  0, w); c.x1  = r[0]; c.vx1  = r[1];
+    r = bounceValue(c.y1,  c.vy1,  0, h); c.y1  = r[0]; c.vy1  = r[1];
+    bgContext.beginPath();
+    bgContext.moveTo(c.x0, c.y0);
+    bgContext.bezierCurveTo(c.cx0, c.cy0, c.cx1, c.cy1, c.x1, c.y1);
+    bgContext.strokeStyle = 'rgba(0,0,0,' + c.alpha + ')';
+    bgContext.lineWidth = 0.85;
+    bgContext.stroke();
+  }
+  requestAnimationFrame(drawBackgroundFrame);
+}
+
+resizeBackgroundCanvas();
+window.addEventListener('resize', resizeBackgroundCanvas);
+drawBackgroundFrame();
+
+/* ============================================================
+   WORD CLUSTERS (Work Page)
+   Each cluster is an SVG containing:
+   - Lines from the center to each skill word
+   - Floating skill words with gentle drift animation
+   - A small inline tooltip on hover
+   - Triggers the bottom skill panel on hover
+   - Center label opens the resume PDF when clicked
+============================================================ */
+var SVG_WIDTH    = 660;
+var SVG_HEIGHT   = 540;
+var SVG_CENTER_X = SVG_WIDTH  / 2;
+var SVG_CENTER_Y = SVG_HEIGHT / 2;
+var ORBIT_RADIUS = 195;
+var SVG_NS       = 'http://www.w3.org/2000/svg';
+
+var storedWordPositions  = []; /* base positions per cluster, used by float animation */
+var activeClusterIndex   = 0;
+var floatAnimationHandle = null;
+var skillPanelCloseTimer = null;
+var workPageIsBuilt      = false;
+
+/*
+  Calculates the base X/Y position for each word in a cluster.
+  Words are evenly spaced around an ellipse.
+  Small jitter values make the layout feel organic, not mechanical.
+*/
+function calculateWordPositions(wordList) {
+  var jitterTable = [-10, 14, 4, -6, 18, 8, -14, 6, -4, 16, -8, 10, 2, -12, 14];
+  var positions = [];
+  for (var i = 0; i < wordList.length; i++) {
+    var angle   = (i / wordList.length) * Math.PI * 2 - Math.PI / 2;
+    var radiusX = ORBIT_RADIUS + jitterTable[i % jitterTable.length];
+    var radiusY = radiusX * 0.68;
+    positions.push({
+      baseX: SVG_CENTER_X + radiusX * Math.cos(angle),
+      baseY: SVG_CENTER_Y + radiusY * Math.sin(angle)
+    });
+  }
+  return positions;
+}
+
+/*
+  Builds one complete SVG for a cluster.
+  Returns the SVG element, ready to be placed in a slide div.
+*/
+function buildClusterSVG(clusterData, clusterIndex) {
+  var svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 ' + SVG_WIDTH + ' ' + SVG_HEIGHT);
+  svg.style.cssText = 'width:100%;height:100%;overflow:visible;display:block;';
+
+  var wordPositions = calculateWordPositions(clusterData.words);
+  storedWordPositions[clusterIndex] = wordPositions;
+
+  /* Draw connection lines from center to each word position */
+  for (var li = 0; li < wordPositions.length; li++) {
+    var line = document.createElementNS(SVG_NS, 'line');
+    line.setAttribute('x1', SVG_CENTER_X);
+    line.setAttribute('y1', SVG_CENTER_Y);
+    line.setAttribute('x2', wordPositions[li].baseX);
+    line.setAttribute('y2', wordPositions[li].baseY);
+    line.setAttribute('stroke', '#000');
+    line.setAttribute('stroke-width', '0.6');
+    line.setAttribute('stroke-opacity', '0.1');
+    line.id = 'cluster-line-' + clusterIndex + '-' + li;
+    svg.appendChild(line);
+  }
+
+  /* Build tooltip group - appended last so it renders above words */
+  var tooltipGroup = document.createElementNS(SVG_NS, 'g');
+  tooltipGroup.id = 'svg-tooltip-' + clusterIndex;
+  tooltipGroup.style.display      = 'none';
+  tooltipGroup.style.pointerEvents = 'none';
+
+  var tooltipBg = document.createElementNS(SVG_NS, 'rect');
+  tooltipBg.setAttribute('width', '204');
+  tooltipBg.setAttribute('height', '26');
+  tooltipBg.setAttribute('rx', '1');
+  tooltipBg.setAttribute('fill', '#fff');
+  tooltipBg.setAttribute('stroke', '#000');
+  tooltipBg.setAttribute('stroke-width', '0.5');
+  tooltipBg.setAttribute('stroke-opacity', '0.36');
+
+  var tooltipLabel = document.createElementNS(SVG_NS, 'text');
+  tooltipLabel.setAttribute('text-anchor', 'middle');
+  tooltipLabel.setAttribute('dominant-baseline', 'middle');
+  tooltipLabel.style.cssText = 'font-family:"Times New Roman",serif;font-size:9.5px;fill:#000;';
+
+  tooltipGroup.appendChild(tooltipBg);
+  tooltipGroup.appendChild(tooltipLabel);
+
+  /* Draw each skill word as an SVG text element */
+  for (var wi = 0; wi < clusterData.words.length; wi++) {
+    (function(wordData, wordIndex, position) {
+
+      var wordElement = document.createElementNS(SVG_NS, 'text');
+      wordElement.setAttribute('x', position.baseX);
+      wordElement.setAttribute('y', position.baseY);
+      wordElement.setAttribute('text-anchor', 'middle');
+      wordElement.setAttribute('dominant-baseline', 'middle');
+      wordElement.style.cssText =
+        'font-family:"Times New Roman",serif;font-size:11px;fill:#000;' +
+        'opacity:0.56;cursor:pointer;user-select:none;transition:opacity 0.2s;';
+      wordElement.textContent = wordData.t;
+      wordElement.id = 'cluster-word-' + clusterIndex + '-' + wordIndex;
+
+      wordElement.addEventListener('mouseenter', function() {
+        /* Highlight the word */
+        wordElement.style.opacity    = '1';
+        wordElement.style.fontWeight = '700';
+
+        /* Highlight its connection line */
+        var connectionLine = document.getElementById('cluster-line-' + clusterIndex + '-' + wordIndex);
+        if (connectionLine) connectionLine.setAttribute('stroke-opacity', '0.32');
+
+        /* Position the SVG tooltip above or below the word */
+        var isInBottomHalf = position.baseY > SVG_HEIGHT * 0.5;
+        var tooltipY = isInBottomHalf ? position.baseY - 38 : position.baseY + 14;
+        tooltipBg.setAttribute('x', position.baseX - 102);
+        tooltipBg.setAttribute('y', tooltipY);
+        tooltipLabel.setAttribute('x', position.baseX);
+        tooltipLabel.setAttribute('y', tooltipY + 13);
+        var summaryText = wordData.summary || '';
+        tooltipLabel.textContent = summaryText.length > 58 ? summaryText.slice(0, 58) + '...' : summaryText;
+        tooltipGroup.style.display = '';
+
+        /* Open the bottom skill panel */
+        clearTimeout(skillPanelCloseTimer);
+        openSkillPanel(wordData.t, wordData.summary, wordData.bullets);
+      });
+
+      wordElement.addEventListener('mouseleave', function() {
+        wordElement.style.opacity    = '0.56';
+        wordElement.style.fontWeight = '400';
+        var connectionLine = document.getElementById('cluster-line-' + clusterIndex + '-' + wordIndex);
+        if (connectionLine) connectionLine.setAttribute('stroke-opacity', '0.1');
+        tooltipGroup.style.display = 'none';
+        /* Small delay so fast mouse movements don't flash the panel shut */
+        skillPanelCloseTimer = setTimeout(closeSkillPanel, 280);
+      });
+
+      svg.appendChild(wordElement);
+
+    })(clusterData.words[wi], wi, wordPositions[wi]);
+  }
+
+  /* Tooltip renders on top of words */
+  svg.appendChild(tooltipGroup);
+
+  /* Center label - the main discipline word */
+  var centerLabel = document.createElementNS(SVG_NS, 'text');
+  centerLabel.setAttribute('x', SVG_CENTER_X);
+  centerLabel.setAttribute('y', SVG_CENTER_Y);
+  centerLabel.setAttribute('text-anchor', 'middle');
+  centerLabel.setAttribute('dominant-baseline', 'middle');
+  centerLabel.style.cssText =
+    'font-family:"Times New Roman",serif;' +
+    'font-size:' + clusterData.labelFontSize + 'px;' +
+    'font-weight:700;fill:#000;letter-spacing:0.1em;' +
+    'user-select:none;cursor:pointer;';
+  centerLabel.textContent = clusterData.label;
+
+  /* Click center label to open resume PDF */
+  /* TO CUSTOMIZE: Remove the alert and uncomment the window.open line */
+  centerLabel.addEventListener('click', (function(resumePath, label) {
+    return function() {
+        window.open(resumePath, '_blank');
+      /*alert('Resume for: ' + label + '\n\nTo activate, find this alert() in the code and replace it with:\nwindow.open("' + resumePath + '", "_blank")');
+       window.open(resumePath, '_blank'); */
+    };
+  })(clusterData.resumeFile, clusterData.label));
+
+  svg.appendChild(centerLabel);
+
+  /* "VIEW RESUME" hint text beneath the center label */
+  var resumeHint = document.createElementNS(SVG_NS, 'text');
+  resumeHint.setAttribute('x', SVG_CENTER_X);
+  resumeHint.setAttribute('y', SVG_CENTER_Y + clusterData.labelFontSize * 0.85 + 6);
+  resumeHint.setAttribute('text-anchor', 'middle');
+  resumeHint.style.cssText =
+    'font-family:"Times New Roman",serif;font-size:8px;fill:#000;' +
+    'opacity:0.26;letter-spacing:0.16em;pointer-events:none;';
+  resumeHint.textContent = 'VIEW RESUME';
+  svg.appendChild(resumeHint);
+
+  return svg;
+}
+
+/*
+  Builds the Work page slides and dots.
+  Runs once when the Work page is first visited.
+*/
+function buildWorkPage() {
+  if (workPageIsBuilt) return;
+  workPageIsBuilt = true;
+
+  var viewport = document.getElementById('cluster-viewport');
+  var dotRow   = document.getElementById('cluster-dot-row');
+  viewport.innerHTML = '';
+  dotRow.innerHTML   = '';
+
+  for (var i = 0; i < ALL_CLUSTERS.length; i++) {
+
+    /* Create slide div */
+    var slide = document.createElement('div');
+    slide.className = 'cluster-slide' + (i === 0 ? ' is-active' : '');
+    slide.id = 'cluster-slide-' + i;
+    slide.appendChild(buildClusterSVG(ALL_CLUSTERS[i], i));
+    viewport.appendChild(slide);
+
+    /* Create dot indicator */
+    var dot = document.createElement('button');
+    dot.className = 'cluster-dot' + (i === 0 ? ' is-active' : '');
+    dot.id = 'cluster-dot-' + i;
+    dot.setAttribute('aria-label', 'Go to ' + ALL_CLUSTERS[i].label);
+    /* Use IIFE to capture loop variable correctly */
+    dot.addEventListener('click', (function(index) {
+      return function() { goToCluster(index); };
+    })(i));
+    dotRow.appendChild(dot);
+  }
+
+  startWordFloatAnimation();
+}
+
+/*
+  Animates skill words with gentle floating motion.
+  Each word has a unique speed and amplitude.
+  Runs continuously in the background.
+*/
+function startWordFloatAnimation() {
+  if (floatAnimationHandle) cancelAnimationFrame(floatAnimationHandle);
+
+  function animationTick(timestamp) {
+    for (var ci = 0; ci < ALL_CLUSTERS.length; ci++) {
+      var positions = storedWordPositions[ci];
+      if (!positions) continue;
+      var wordList = ALL_CLUSTERS[ci].words;
+      for (var wi = 0; wi < wordList.length; wi++) {
+        var wordEl = document.getElementById('cluster-word-' + ci + '-' + wi);
+        if (!wordEl) continue;
+        var pos           = positions[wi];
+        var floatX        = Math.sin(wi * 1.7) * 5;
+        var floatY        = Math.cos(wi * 2.3) * 4.2;
+        var cycleDuration = 3200 + (wi % 5) * 550;
+        var cycleAngle    = ((timestamp / cycleDuration) + wi * 0.6) % 1 * Math.PI * 2;
+        wordEl.setAttribute('x', pos.baseX + Math.sin(cycleAngle) * floatX);
+        wordEl.setAttribute('y', pos.baseY + Math.cos(cycleAngle) * floatY);
+      }
+    }
+    floatAnimationHandle = requestAnimationFrame(animationTick);
+  }
+
+  floatAnimationHandle = requestAnimationFrame(animationTick);
+}
+
+/*
+  Slides from the current cluster to another.
+  Direction determines whether old slides left or right.
+*/
+function goToCluster(nextIndex) {
+  if (nextIndex === activeClusterIndex) return;
+
+  var direction = nextIndex > activeClusterIndex ? 1 : -1;
+  var oldSlide  = document.getElementById('cluster-slide-' + activeClusterIndex);
+  var newSlide  = document.getElementById('cluster-slide-' + nextIndex);
+  var oldDot    = document.getElementById('cluster-dot-'   + activeClusterIndex);
+  var newDot    = document.getElementById('cluster-dot-'   + nextIndex);
+
+  /* Exit old slide */
+  oldSlide.classList.remove('is-active');
+  oldSlide.classList.add(direction > 0 ? 'is-exiting-left' : 'is-exiting-right');
+  setTimeout(function() {
+    oldSlide.classList.remove('is-exiting-left', 'is-exiting-right');
+  }, 520);
+
+  /* Prime new slide off-screen then animate in */
+  newSlide.style.transition = 'none';
+  newSlide.style.transform  = 'translateX(' + (direction > 0 ? 80 : -80) + 'px)';
+  newSlide.style.opacity    = '0';
+  newSlide.getBoundingClientRect(); /* force browser reflow */
+  newSlide.style.transition = '';
+  newSlide.style.transform  = '';
+  newSlide.style.opacity    = '';
+  newSlide.classList.add('is-active');
+
+  /* Update dots */
+  oldDot.classList.remove('is-active');
+  newDot.classList.add('is-active');
+
+  /* Update counter */
+  activeClusterIndex = nextIndex;
+  document.getElementById('cluster-page-counter').textContent =
+    String(nextIndex + 1).padStart(2, '0') + ' / ' +
+    String(ALL_CLUSTERS.length).padStart(2, '0');
+}
+
+/* Called by arrow buttons. direction is -1 (prev) or 1 (next) */
+function navigateCluster(direction) {
+  var nextIndex = (activeClusterIndex + direction + ALL_CLUSTERS.length) % ALL_CLUSTERS.length;
+  goToCluster(nextIndex);
+}
+
+/* ============================================================
+   SKILL DETAIL PANEL
+============================================================ */
+function openSkillPanel(skillName, skillSummary, skillBullets) {
+  document.getElementById('skill-panel-name').textContent    = skillName;
+  document.getElementById('skill-panel-summary').textContent = skillSummary || '';
+
+  var bulletList = document.getElementById('skill-panel-bullets');
+  bulletList.innerHTML = '';
+  var bullets = skillBullets || [];
+  for (var i = 0; i < bullets.length; i++) {
+    var item = document.createElement('li');
+    item.textContent = bullets[i];
+    bulletList.appendChild(item);
+  }
+
+  document.getElementById('skill-detail-panel').classList.add('is-open');
+}
+
+function closeSkillPanel() {
+  document.getElementById('skill-detail-panel').classList.remove('is-open');
+}
+
+/* ============================================================
+   PORTFOLIO PAGE BUILDER
+   Creates tiles and injects them into the grid.
+   Runs once on first visit to Portfolio page.
+============================================================ */
+var portfolioIsBuilt = false;
+
+/* Returns an SVG string showing a grey placeholder image with an X */
+function makePlaceholderSVG() {
+  return '<svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<rect width="100" height="100" fill="#ebebeb"/>' +
+    '<line x1="0" y1="0" x2="100" y2="100" stroke="#c0c0c0" stroke-width="0.8"/>' +
+    '<line x1="100" y1="0" x2="0" y2="100" stroke="#c0c0c0" stroke-width="0.8"/>' +
+    '<rect x="0" y="0" width="100" height="100" fill="none" stroke="#d0d0d0" stroke-width="0.5"/>' +
+    '</svg>';
+}
+
+function buildPortfolioPage() {
+  if (portfolioIsBuilt) return;
+  portfolioIsBuilt = true;
+
+  var grid = document.getElementById('project-grid');
+
+  for (var i = 0; i < ALL_PROJECTS.length; i++) {
+    (function(projectData, projectIndex) {
+
+      var tile = document.createElement('div');
+      tile.className = 'project-tile';
+
+      tile.innerHTML =
+        /* Thumbnail — overflow:hidden clips the image only */
+        '<div class="project-thumbnail-wrapper">' +
+          '<div class="project-thumbnail">' + makePlaceholderSVG() + '</div>' +
+        '</div>' +
+        /* Resting strip — visible at rest, fades on hover */
+        '<div class="project-resting-strip">' +
+          '<p class="resting-strip-category">' + projectData.category + '</p>' +
+          '<p class="resting-strip-title">'    + projectData.title    + '</p>' +
+        '</div>' +
+        /* Info panel — hidden at rest, expands on hover */
+        '<div class="project-info-panel">' +
+          '<div class="project-info-inner">' +
+            '<p class="project-info-category">'    + projectData.category    + '</p>' +
+            '<h3 class="project-info-title">'      + projectData.title       + '</h3>' +
+            '<p class="project-info-description">' + projectData.description + '</p>' +
+            '<button class="project-view-button">VIEW IMAGES</button>' +
+          '</div>' +
+        '</div>';
+
+      /* Wire up the View Images button */
+      tile.querySelector('.project-view-button').addEventListener('click', function(event) {
+        event.stopPropagation();
+        openLightbox(projectData);
+      });
+
+      grid.appendChild(tile);
+
+      /* Staggered entrance: each tile appears slightly after the previous */
+      setTimeout(function() {
+        tile.classList.add('is-revealed');
+      }, 60 + projectIndex * 75);
+
+    })(ALL_PROJECTS[i], i);
+  }
+}
+
+/* ============================================================
+   LIGHTBOX
+   Opens over the portfolio page to show project images.
+   TO CUSTOMIZE: Replace makePlaceholderSVG() calls with real
+   <img src="..."> tags pointing to your actual image files.
+============================================================ */
+function openLightbox(projectData) {
+  document.getElementById('lightbox-category').textContent    = projectData.category;
+  document.getElementById('lightbox-title').textContent       = projectData.title;
+  document.getElementById('lightbox-description').textContent = projectData.description;
+
+  var imageGrid = document.getElementById('lightbox-image-grid');
+  imageGrid.innerHTML = '';
+  var imageCount = projectData.imageCount || 2;
+  for (var i = 0; i < imageCount; i++) {
+    var slot = document.createElement('div');
+    slot.className = 'lightbox-image-slot';
+    slot.innerHTML = makePlaceholderSVG();
+    imageGrid.appendChild(slot);
+  }
+
+  document.getElementById('lightbox-overlay').classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox-overlay').classList.remove('is-open');
+  document.body.style.overflow = '';
+}
+
+/* Escape key closes any open overlay */
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    closeLightbox();
+    closeSkillPanel();
+  }
+});
+
+/* ============================================================
+   INITIALIZATION
+   Runs once when the page first loads.
+============================================================ */
+
+/* Trigger home divider animation */
+setTimeout(function() {
+  document.getElementById('home-divider-line').classList.add('is-revealed');
+}, 500);
+
+/* Pre-build the Work page so it's ready instantly when clicked */
+buildWorkPage();
+
+</script>
+</body>
+</html>
