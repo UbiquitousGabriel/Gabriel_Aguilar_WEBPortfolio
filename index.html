@@ -1275,7 +1275,9 @@ function buildClusterSVG(clusterData, clusterIndex) {
         tooltipLabel.setAttribute('y', tooltipY + 13);
         var summaryText = wordData.summary || '';
         tooltipLabel.textContent = summaryText.length > 58 ? summaryText.slice(0, 58) + '...' : summaryText;
-        tooltipGroup.style.display = '';
+        /* The small box under the hovered word is turned off (the summary already
+           shows in the bottom panel). To bring it back, uncomment the next line. */
+        /* tooltipGroup.style.display = ''; */
 
         /* Open the bottom skill panel */
         clearTimeout(skillPanelCloseTimer);
