@@ -133,10 +133,7 @@ button { cursor:pointer; font-family:inherit; }
 .home-photo-box span { font-size:9px; letter-spacing:0.2em; opacity:0.22; }
 .home-photo-caption { font-size:12px; letter-spacing:0.1em; opacity:0.65; margin-top:10px; }
 .home-headshot { border:1px solid rgba(var(--ink-rgb),0.15); border-radius:3px; }
-.home-headshot-live { position:relative; width:175px; height:235px; overflow:hidden; background:#0A0807; }
-.home-headshot-live img, .home-headshot-live iframe { position:absolute; inset:0; width:100%; height:100%; border:0; display:block; }
-.home-headshot-live img { object-fit:cover; }
-@media (prefers-reduced-motion: reduce) { .home-headshot-live iframe { display:none; } }
+
 .home-bio-column { padding-top:4px; }
 .home-bio-text { font-size:20px; line-height:1.92; margin:0 0 42px; max-width:500px; letter-spacing:0.01em; }
 .home-contact-label { font-size:11px; letter-spacing:0.24em; opacity:0.6; margin:0 0 8px; }
@@ -400,11 +397,7 @@ body, .navbar, .project-tile, #skill-detail-panel { transition:background-color 
       <!-- Left: Photo -->
       <!-- TO CUSTOMIZE: Replace the div below with an img tag pointing to your photo -->
       <div>
-       <!-- Live particle portrait. The static headshot shows if the frame can't load. -->
-       <div class="home-headshot home-headshot-live">
-         <img src="assets/images/Gabriel_Headshot.jpg" alt="Gabriel Aguilar" />
-         <iframe src="assets/particles-headshot.html" title="Gabriel Aguilar, as a particle portrait" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>
-       </div>
+       <img class="home-headshot" src="assets/images/Gabriel_Headshot_Glitch.jpg" alt="Gabriel Aguilar" style="width:175px;height:235px;object-fit:cover;display:block;" />
         <p class="home-photo-caption">Gabriel Aguilar</p>
       </div>
 
@@ -561,7 +554,7 @@ var ALL_CLUSTERS = [
         bullets: [
           "Edited branded content for Johnson & Johnson's Live Healthy Live Well internal campaign at MCM Creative",
           "Cut promotional content for The Princess Grace Foundation, Mount Sinai Hospital, and Schulte Roth & Zabel",
-          "Edited event video for The Moth Project and promotional content for GRIT Boxing",
+          "Edited event video for The Moth Project; one of three editors on GRIT BXNG, cutting 100+ workout videos on a custom template plus promotional content (2019)",
           "Directed and edited award-winning short film I Have A Confidence Issue, Best Film, Youth Arts Exhibition",
         ]
       },
@@ -1000,6 +993,13 @@ var ALL_PROJECTS = [
       { src: "assets/images/work/moth-peter.jpg", caption: "The Moth Project, 2022." },
       { src: "assets/images/work/moth-intro.jpg", caption: "The Moth Project, 2022." },
       { src: "assets/images/work/jj-story.jpg",   caption: "Johnson & Johnson, Live Healthy, Live Well, 2020." },
+    ] },
+
+  { title: "GRIT BXNG", category: "Film",
+    description: "Workout videos for a Union Square boxing studio, cut on a custom template. One of my first jobs in the city, 2019.",
+    details: "One of my first jobs in New York. Through MCM Creative I was one of three editors on GRIT BXNG, a boxing and HIIT studio in Union Square, cutting more than 100 of the workout videos that play on the studio's screens during class, plus promotional content. Every video was built on a custom template, so a class could follow the rounds, the timing and the technique on screen while the music and lights did the rest.",
+    media: [
+      { src: "assets/images/work/grit-workouts.jpg", caption: "100+ workout videos, 2019." },
     ] },
 
   { title: "The Dan Fogler 4DXperience", category: "Audio",
