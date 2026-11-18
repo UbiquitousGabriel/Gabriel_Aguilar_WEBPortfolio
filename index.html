@@ -319,6 +319,9 @@ button { cursor:pointer; font-family:inherit; }
 .lightbox-image-slot.has-media { padding-top:0; background:none; }
 .lightbox-image-slot.is-wide { grid-column:1 / -1; }
 .lightbox-image-slot img, .lightbox-image-slot video { width:100%; height:auto; display:block; background:#000; }
+.lightbox-image-slot.is-small { grid-column:1 / -1; text-align:center; padding:18px 0 6px; }
+.lightbox-image-slot.is-small img { width:auto; max-width:60%; max-height:360px; margin:0 auto; background:none; }
+.lightbox-embed { width:100%; border:0; display:block; background:transparent; border-radius:10px; overflow:hidden; }
 .lightbox-image-caption { font-size:12px; letter-spacing:0.04em; opacity:0.65; padding:7px 4px 9px; font-style:italic; }
 .lightbox-links { margin-top:14px; }
 .lightbox-links a { color:var(--ink); font-size:12px; letter-spacing:0.16em; text-transform:uppercase; margin-right:18px; }
@@ -633,6 +636,7 @@ var ALL_CLUSTERS = [
         bullets: [
           "Managed audio input and sound editing across post-production work at MCM Creative",
           "Coordinated audio with performance and pyrotechnic timing as Sound Engineer for Camp Chen-A-Wanda Annual Fireworks Display",
+          "Audio editor on The Dan Fogler 4DXperience podcast, including S8, Episode 6 with Max Brooks (2023)",
           "Applied sound editing skills to narrative and commercial video projects",
         ]
       },
@@ -902,10 +906,11 @@ var ALL_CLUSTERS = [
    PORTFOLIO PROJECT DATA
    TO CUSTOMIZE:
    - title: project name
-   - category: Creative Technology / Theater / Film / Games
+   - category: Creative Technology / Theater / Film / Audio / Games
    - description: one or two sentences, shown on the tile
    - details: the longer paragraph shown in the popup
-   - media: images ({ src, caption }) or video ({ video, poster });
+   - media: images ({ src, caption }), video ({ video, poster }) or an
+     embedded player ({ embed, height });
      the first one is the tile thumbnail. Files live in
      assets/images/work/ and assets/video/.
    - links (optional): [{ label, href }] shown in the popup
@@ -995,6 +1000,16 @@ var ALL_PROJECTS = [
       { src: "assets/images/work/moth-peter.jpg", caption: "The Moth Project, 2022." },
       { src: "assets/images/work/moth-intro.jpg", caption: "The Moth Project, 2022." },
       { src: "assets/images/work/jj-story.jpg",   caption: "Johnson & Johnson, Live Healthy, Live Well, 2020." },
+    ] },
+
+  { title: "The Dan Fogler 4DXperience", category: "Audio",
+    description: "Audio editor on Dan Fogler's podcast, including S8, Episode 6 with Max Brooks, 2023.",
+    details: "I edited and balanced the audio for episodes of The Dan Fogler 4DXperience, Dan Fogler's podcast for people who love movies. Give the Max Brooks episode a listen: S8, Episode 6, Facing Future Fears, where the author of World War Z talks about his new Minecraft book.",
+    links: [ { label: "Listen on Apple Podcasts", href: "https://podcasts.apple.com/us/podcast/s8-episode-6-facing-future-fears-with-max-brooks/id1145191833?i=1000635555650" } ],
+    media: [
+      { embed: "https://embed.podcasts.apple.com/us/podcast/s8-episode-6-facing-future-fears-with-max-brooks/id1145191833?i=1000635555650&theme=dark", height: 175,
+        caption: "S8, Episode 6: Facing Future Fears with Max Brooks." },
+      { src: "assets/images/work/4dx-artwork.jpg", caption: "Show artwork by Randy Martinez.", small: true },
     ] },
 
   { title: "LOOM", category: "Games",
@@ -1810,18 +1825,28 @@ function openLightbox(projectData) {
   }
   var halfCount = 0, lastHalf = -1;
   media.forEach(function (item, i) {
-    if (!item.video && !item.wide) { halfCount++; lastHalf = i; }
+    if (!item.video && !item.embed && !item.wide) { halfCount++; lastHalf = i; }
   });
   media.forEach(function (item, index) {
     var slot = document.createElement('figure');
     slot.className = 'lightbox-image-slot has-media';
     /* Video, a lone image, or an odd last half-width image spans both columns */
-    if (item.video || item.wide || halfCount === 1 ||
+    if (item.video || item.embed || item.wide || halfCount === 1 ||
         (index === lastHalf && halfCount % 2 === 1)) {
       slot.classList.add('is-wide');
     }
+    if (item.small) slot.classList.add('is-small');
     var el;
-    if (item.video) {
+    if (item.embed) {
+      el = document.createElement('iframe');
+      el.src = item.embed;
+      el.className = 'lightbox-embed';
+      el.style.height = (item.height || 175) + 'px';
+      el.setAttribute('allow', 'autoplay *; encrypted-media *; fullscreen *; clipboard-write');
+      el.setAttribute('sandbox', 'allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation');
+      el.setAttribute('title', item.caption || projectData.title);
+      el.loading = 'lazy';
+    } else if (item.video) {
       el = document.createElement('video');
       el.src = item.video; el.poster = item.poster || '';
       el.controls = true; el.playsInline = true; el.preload = 'none';
