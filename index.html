@@ -94,7 +94,7 @@ button { cursor:pointer; font-family:inherit; }
    PAGE SYSTEM
    Only one .page is visible at a time.
    Pages are display:none unless they have .is-visible.
-   This is the entire routing system — no bleed between pages.
+   This is the entire routing system, no bleed between pages.
 ============================================================ */
 .page {
   display:none;
@@ -133,6 +133,7 @@ button { cursor:pointer; font-family:inherit; }
 .home-photo-box span { font-size:9px; letter-spacing:0.2em; opacity:0.22; }
 .home-photo-caption { font-size:12px; letter-spacing:0.1em; opacity:0.65; margin-top:10px; }
 .home-headshot { border:1px solid rgba(var(--ink-rgb),0.15); border-radius:3px; }
+
 .home-bio-column { padding-top:4px; }
 .home-bio-text { font-size:20px; line-height:1.92; margin:0 0 42px; max-width:500px; letter-spacing:0.01em; }
 .home-contact-label { font-size:11px; letter-spacing:0.24em; opacity:0.6; margin:0 0 8px; }
@@ -146,7 +147,7 @@ button { cursor:pointer; font-family:inherit; }
 .home-divider-line.is-revealed { transform:scaleX(1); }
 .home-discipline-tags { display:flex; gap:28px; }
 .home-tag {
-  /* Film / Theater / Creative Technology — real buttons now (click to jump to that cluster) */
+  /* Film / Theater / Creative Technology, real buttons now (click to jump to that cluster) */
   background:none; border:none; border-bottom:1px solid transparent;
   font-family:inherit; font-size:14px; letter-spacing:0.22em;
   color:var(--ink); opacity:0.7; padding:8px 0; cursor:pointer;
@@ -254,6 +255,7 @@ button { cursor:pointer; font-family:inherit; }
 }
 .project-tile:hover .project-thumbnail { padding-top:86%; }
 .project-thumbnail svg { position:absolute; inset:0; width:100%; height:100%; }
+.project-thumbnail img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
 .project-resting-strip {
   padding:13px 18px 15px; border-top:1px solid rgba(var(--ink-rgb),0.06);
   overflow:hidden; max-height:80px;
@@ -311,6 +313,15 @@ button { cursor:pointer; font-family:inherit; }
 .lightbox-image-grid { display:grid; grid-template-columns:1fr 1fr; gap:3px; padding:3px; }
 .lightbox-image-slot { padding-top:66%; position:relative; background:var(--placeholder); }
 .lightbox-image-slot svg { position:absolute; inset:0; width:100%; height:100%; }
+.lightbox-image-slot.has-media { padding-top:0; background:none; }
+.lightbox-image-slot.is-wide { grid-column:1 / -1; }
+.lightbox-image-slot img, .lightbox-image-slot video { width:100%; height:auto; display:block; background:#000; }
+.lightbox-image-slot.is-small { grid-column:1 / -1; text-align:center; padding:18px 0 6px; }
+.lightbox-image-slot.is-small img { width:auto; max-width:60%; max-height:360px; margin:0 auto; background:none; }
+.lightbox-embed { width:100%; border:0; display:block; background:transparent; border-radius:10px; overflow:hidden; }
+.lightbox-image-caption { font-size:12px; letter-spacing:0.04em; opacity:0.65; padding:7px 4px 9px; font-style:italic; }
+.lightbox-links { margin-top:14px; }
+.lightbox-links a { color:var(--ink); font-size:12px; letter-spacing:0.16em; text-transform:uppercase; margin-right:18px; }
 .lightbox-footer-note {
   padding:24px 40px 32px; font-size:13px; opacity:0.7;
   line-height:1.76; font-style:italic; border-top:1px solid rgba(var(--ink-rgb),0.07);
@@ -386,7 +397,7 @@ body, .navbar, .project-tile, #skill-detail-panel { transition:background-color 
       <!-- Left: Photo -->
       <!-- TO CUSTOMIZE: Replace the div below with an img tag pointing to your photo -->
       <div>
-       <img class="home-headshot" src="assets/images/Gabriel_Headshot.jpg" alt="Gabriel Aguilar" style="width:175px;height:235px;object-fit:cover;display:block;" />
+       <img class="home-headshot" src="assets/images/Gabriel_Headshot_Glitch.jpg" alt="Gabriel Aguilar" style="width:175px;height:235px;object-fit:cover;display:block;" />
         <p class="home-photo-caption">Gabriel Aguilar</p>
       </div>
 
@@ -394,14 +405,17 @@ body, .navbar, .project-tile, #skill-detail-panel { transition:background-color 
       <div class="home-bio-column">
         <!-- TO CUSTOMIZE: Edit bio text here -->
         <p class="home-bio-text">
-          Gabriel Aguilar is a highly motivated art worker with a diverse skill set in video,
-          live event production, and emergent media technology. Seeking to contribute to
-          innovative projects in a creative technology role.
+          I work where theater, video and technology meet. I'm a video technician at
+          The Public Theater, an A/V tech at The Bell House, and a research fellow at
+          CUNY City Tech, where I finish my BTech in Emerging Media Technologies this December.
+          Right now I'm building the Self-Aware Room: a projection-mapped space that
+          responds to the people inside it.
         </p>
         <p class="home-contact-label">CONTACT</p>
         <!-- TO CUSTOMIZE: Update phone number and email address -->
         <a class="home-contact-link" href="tel:7174228560">(717) 422-8560</a>
         <a class="home-contact-link" href="mailto:gaaguilarfilm@gmail.com">gaaguilarfilm@gmail.com</a>
+        <a class="home-contact-link" href="https://ubiquitousgabriel.itch.io" target="_blank" rel="noopener">ubiquitousgabriel.itch.io</a>
       </div>
 
     </div>
@@ -475,11 +489,12 @@ body, .navbar, .project-tile, #skill-detail-panel { transition:background-color 
       <p class="lightbox-category"    id="lightbox-category"></p>
       <h2 class="lightbox-title"      id="lightbox-title"></h2>
       <p class="lightbox-description" id="lightbox-description"></p>
+      <p class="lightbox-links" id="lightbox-links"></p>
     </div>
     <!-- Image slots injected here by openLightbox() -->
     <div class="lightbox-image-grid" id="lightbox-image-grid"></div>
     <p class="lightbox-footer-note">
-      Additional images, video documentation, and project notes will appear here once content is added.
+      Production photos belong to their photographers and are credited under each image.
     </p>
   </div>
 </div>
@@ -539,8 +554,8 @@ var ALL_CLUSTERS = [
         bullets: [
           "Edited branded content for Johnson & Johnson's Live Healthy Live Well internal campaign at MCM Creative",
           "Cut promotional content for The Princess Grace Foundation, Mount Sinai Hospital, and Schulte Roth & Zabel",
-          "Edited event video for The Moth Project and promotional content for GRIT Boxing",
-          "Directed and edited award-winning short film I Have A Confidence Issue — Best Film, Youth Arts Exhibition",
+          "Edited event video for The Moth Project; one of three editors on GRIT BXNG, cutting 100+ workout videos on a custom template plus promotional content (2019)",
+          "Directed and edited award-winning short film I Have A Confidence Issue, Best Film, Youth Arts Exhibition",
         ]
       },
       {
@@ -549,14 +564,14 @@ var ALL_CLUSTERS = [
         bullets: [
           "Operated video playback, projection, and camera systems at The Public Theater across multiple productions",
           "Managed camera feed routing and live imaging for hybrid theatrical livestream (Circle Jerk, Fake Friends LLC)",
-          "Managed file mannagement, dailies, and data prtoection while on shoots with MCM Creative",
+          "Managed files, dailies and data protection on shoots with MCM Creative",
         ]
       },
       {
         t: "Directing",
         summary: "Short-form narrative direction for film and multimedia projects.",
         bullets: [
-          "Directed and wrote I Have A Confidence Issue — won Best Film at the Youth Arts Exhibition",
+          "Directed and wrote I Have A Confidence Issue, won Best Film at the Youth Arts Exhibition",
           "Directed Neon Noir, a multimedia performance piece, at CASA",
           "Developed 2.5D surreal narrative game concept with full character and environment direction",
         ]
@@ -576,8 +591,8 @@ var ALL_CLUSTERS = [
         t: "Electrics",
         summary: "On-set and in-venue electrical setup for film and live production.",
         bullets: [
-          "Worked across multiple shoot supporting the lighting departments for film projects while freelance",
-          "Worked as Theater Electrician at MITU 580 (Feb 2024 & Jun 2025) — installation, load-in, strike",
+          "Worked across multiple shoots supporting the lighting departments for film projects while freelance",
+          "Worked as Theater Electrician at MITU 580 (Feb 2024 & Jun 2025), installation, load-in, strike",
           "Managed circuit distribution and DMX addressing for lighting systems at Camp Chen-A-Wanda",
           "Supported electrical and lighting setup across freelance gigs at The Connelly and The Public",
         ]
@@ -614,6 +629,7 @@ var ALL_CLUSTERS = [
         bullets: [
           "Managed audio input and sound editing across post-production work at MCM Creative",
           "Coordinated audio with performance and pyrotechnic timing as Sound Engineer for Camp Chen-A-Wanda Annual Fireworks Display",
+          "Producer and audio editor on The Dan Fogler 4DXperience podcast; edited, mixed and distributed episodes through Megaphone, including S8, Episode 6 with Max Brooks (2023)",
           "Applied sound editing skills to narrative and commercial video projects",
         ]
       },
@@ -629,9 +645,9 @@ var ALL_CLUSTERS = [
         t: "Writing",
         summary: "Original writing for theater, film, and interactive narrative.",
         bullets: [
-          "Wrote and directed I Have A Confidence Issue — awarded Best Film at Youth Arts Exhibition",
-          "Wrote Mankind (in development) — a theater piece following cavemen constructing society and culture",
-          "Wrote cryoCommunist Play (in development) — set in a frozen communist alien society with class system dynamics",
+          "Wrote and directed I Have A Confidence Issue, awarded Best Film at Youth Arts Exhibition",
+          "Wrote Mankind (in development), a theater piece following cavemen constructing society and culture",
+          "Wrote cryoCommunist Play (in development), set in a frozen communist alien society with class system dynamics",
           "Co-developing The One True World, a novel series following two protagonists in a fantasy war-torn world",
         ]
       },
@@ -640,20 +656,20 @@ var ALL_CLUSTERS = [
         summary: "Stage and screen direction spanning theater, multimedia, and devised work.",
         bullets: [
           "Directed Neon Noir, a multimedia performance piece, at CASA",
-          "Directed and wrote I Have A Confidence Issue — Best Film, Youth Arts Exhibition",
+          "Directed and wrote I Have A Confidence Issue, Best Film, Youth Arts Exhibition",
           "Directed all technical aspects of youth theater productions as Technical Director at Camp Chen-A-Wanda (2021–Present)",
-          "Developing Cruise de Carnivore — a virtual XR play where users follow individual passengers through a wartime cruise ship narrative",
+          "Developing Cruise de Carnivore, a virtual XR play where users follow individual passengers through a wartime cruise ship narrative",
         ]
       },
       {
         t: "Acting",
         summary: "Trained performer with 6 years of acting training and musical theater credits.",
         bullets: [
-          "Berger in Hair — Weary Arts Group",
-          "Seymour in Little Shop of Horrors — Stuart Landon",
-          "Oscar Lindquist in Sweet Charity — Stuart Landon",
-          "Danny in Grease — Allenberry Playhouse",
-          "Lewis in Pippin — CASA",
+          "Berger in Hair, Weary Arts Group",
+          "Seymour in Little Shop of Horrors, Stuart Landon",
+          "Oscar Lindquist in Sweet Charity, Stuart Landon",
+          "Danny in Grease, Allenberry Playhouse",
+          "Lewis in Pippin, CASA",
           "6 years acting training at Aalsedek Theatre School; 3 years voice training with David Glasgow",
         ]
       },
@@ -662,8 +678,8 @@ var ALL_CLUSTERS = [
         summary: "Scenic and spatial design for theatrical and immersive productions.",
         bullets: [
           "Designed environments for Neon Noir multimedia production at CASA",
-          "Developed PORTALS installation series — portal frames housing virtual tableaus mounted into architectural surfaces",
-          "Conceptualized Witching Hour installation — multi-screen witch trial simulation with sound and heating elements",
+          "Developed PORTALS installation series, portal frames housing virtual tableaus mounted into architectural surfaces",
+          "Conceptualized Witching Hour installation, multi-screen witch trial simulation with sound and heating elements",
           "Designed immersive spatial layouts for youth theater at Camp Chen-A-Wanda",
         ]
       },
@@ -672,8 +688,9 @@ var ALL_CLUSTERS = [
         summary: "Theatrical lighting design, programming, and systems operation.",
         bullets: [
           "Lighting Designer for youth theater productions at Camp Chen-A-Wanda, Shield's Theater (2021–Present)",
+          "Drafted a 67-fixture lighting plot in Vectorworks, with paperwork in Lightwright and a patch for an ETC Eos console (ENT 1250)",
           "DMX addressing, circuit distribution, and lighting programming across freelance gigs",
-          "Theater Electrician at MITU 580 (Feb 2024 & Jun 2025) — installation and maintenance of theatrical lighting systems",
+          "Theater Electrician at MITU 580 (Feb 2024 & Jun 2025), installation and maintenance of theatrical lighting systems",
           "Supported lighting assembly and rigging at The Connelly and The Public Theater",
         ]
       },
@@ -681,8 +698,8 @@ var ALL_CLUSTERS = [
         t: "Stage Management",
         summary: "Full production coordination from rehearsal to run.",
         bullets: [
-          "ASM on A Play Titled After the Collective Noun for Female-Identifying 20-Somethings Living in NYC in the 2010s — Corkscrew Theater Festival",
-          "ASM on A Real Boy — Ivy Theater Company, 59E59",
+          "ASM on A Play Titled After the Collective Noun for Female-Identifying 20-Somethings Living in NYC in the 2010s, Corkscrew Theater Festival",
+          "ASM on A Real Boy, Ivy Theater Company, 59E59",
           "Managed rehearsal schedules, props tracking, and blocking documentation",
           "Communicated key load-in and setup details to run crew across multiple freelance productions",
         ]
@@ -692,7 +709,7 @@ var ALL_CLUSTERS = [
         summary: "Live operation of lighting and sound consoles during performance.",
         bullets: [
           "Operated lighting and sound systems for live youth theater productions at Camp Chen-A-Wanda",
-          "Managed live sound for Camp Chen-A-Wanda Annual Fireworks Display — coordinating audio with pyrotechnic timing",
+          "Managed live sound for Camp Chen-A-Wanda Annual Fireworks Display, coordinating audio with pyrotechnic timing",
           "Operated video playback and projection systems live at The Public Theater across multiple productions",
         ]
       },
@@ -700,10 +717,12 @@ var ALL_CLUSTERS = [
         t: "Video Engineering",
         summary: "Live video systems design and operation in theatrical contexts.",
         bullets: [
-          "Video Technician at The Public Theater — video, projection, closed-captioning, and playback systems (May 2023–Present)",
-          "Assistant Video Engineer on Circle Jerk — managed camera systems, video routing, and live broadcast sync (Fake Friends LLC, The Connelly)",
+          "Video Technician at The Public Theater, video, projection, closed-captioning, and playback systems (May 2023–Present)",
+          "Assistant Video Engineer on Circle Jerk, managed camera systems, video routing, and live broadcast sync (Fake Friends LLC, The Connelly)",
           "Promoted to AVE on Circle Jerk within two days; contributed to camera rig design",
           "A/V Engineer on Comedy of Errors at The Public Theater",
+          "Designed and built EasyCaption, a browser-based captioning tool The Public uses for accessible performances",
+          "Video crew on My Joy Is Heavy (New York Theatre Workshop) and video tech on Did You Eat? (The Public); A/V tech at The Bell House",
         ]
       },
       {
@@ -720,7 +739,7 @@ var ALL_CLUSTERS = [
         t: "Technical Directing",
         summary: "Overseeing all technical departments and infrastructure for live productions.",
         bullets: [
-          "Technical Director at Camp Chen-A-Wanda, Shield's Theater (2021–Present) — coordinates lighting, sound, rigging, and performance",
+          "Technical Director at Camp Chen-A-Wanda, Shield's Theater (2021–Present), coordinates lighting, sound, rigging, and performance",
           "Built Camp Chen-A-Wanda's A/V system from the ground up; modernized legacy infrastructure",
           "Managed technical coordination across departments at The Connelly, The Public, and festival venues",
           "Oversaw load-in, systems check, troubleshooting, and assembly for high-profile NYC theatrical productions",
@@ -740,8 +759,8 @@ var ALL_CLUSTERS = [
         t: "Networking",
         summary: "Technical networking for live production systems and real-time media.",
         bullets: [
-          "Researched and presented on real-time networking for live events — TouchDesigner integration, latency modeling, data routing",
-          "Designed multi-streaming infrastructure for Theater LIVE! platform proposal — OBS, Restream.io, multi-platform broadcast architecture",
+          "Researched and presented on real-time networking for live events, TouchDesigner integration, latency modeling, data routing",
+          "Designed multi-streaming infrastructure for Theater LIVE! platform proposal, OBS, Restream.io, multi-platform broadcast architecture",
           "Managed networked A/V systems and show networking across freelance theatrical productions",
           "Studied protocol-based communication models for interactive performance systems at NYCCT",
         ]
@@ -760,6 +779,7 @@ var ALL_CLUSTERS = [
         bullets: [
           "Designed and deployed projection-mapping systems for theatrical productions as freelance A/V engineer (2020–Present)",
           "Integrated projection mapping into live performance environments at The Public Theater",
+          "Building the Self-Aware Room (CHI Research Fellowship, City Tech): a TouchDesigner system, mapped with KantanMapper, that responds to the people in the room",
           "Applied projection design to immersive spatial storytelling across NYC theatrical contexts",
           "Studied projection-mapped space as a core axis of immersive theater design at NYCCT",
         ]
@@ -768,7 +788,7 @@ var ALL_CLUSTERS = [
         t: "Unity",
         summary: "Real-time 3D development for interactive games and experiences.",
         bullets: [
-          "Developing 2.5D surreal narrative game in Unity — multi-character structure, surreal environments, camera-driven gameplay",
+          "Developing 2.5D surreal narrative game in Unity, multi-character structure, surreal environments, camera-driven gameplay",
           "Using Unity for interactive experience design within BTech Emerging Media Technologies curriculum",
           "Planned Unity integration for PORTALS virtual tableau installation series",
           "Exploring Unity as engine for Cruise de Carnivore XR theatrical experience",
@@ -788,9 +808,10 @@ var ALL_CLUSTERS = [
         summary: "Physical prototyping, custom hardware, and mixed-media construction.",
         bullets: [
           "Built custom control box and fabricated physical interface for Peephole Shower Arduino installation",
-          "Fabricated portal frames for PORTALS installation series — LED screens mounted into architectural surfaces",
+          "Took Peephole from sketches to chipboard to 3D prints; it came back as Rainman, with two ESP32 knobs driving a particle system",
+          "Fabricated portal frames for PORTALS installation series, LED screens mounted into architectural surfaces",
           "Hands-on assembly and rigging across 5+ years of theatrical production work",
-          "Developing Decentralized Creative Laboratory concept — physical fabrication stations for hybrid digital/analog workflow",
+          "Developing Decentralized Creative Laboratory concept, physical fabrication stations for hybrid digital/analog workflow",
         ]
       },
       {
@@ -807,8 +828,8 @@ var ALL_CLUSTERS = [
         summary: "Additive manufacturing for props, prototypes, and installation components.",
         bullets: [
           "Used 3D modeling and fabrication tools within BTech Emerging Media Technologies curriculum at NYCCT",
-          "Applied rapid prototyping methodology — a core skill area in the Emerging Media Technologies program",
-          "Exploring 3D printing for props and physical components in PORTALS and Decentralized Creative Laboratory projects",
+          "Applied rapid prototyping methodology, a core skill area in the Emerging Media Technologies program",
+          "Modeled and 3D printed the Peephole display (MTEC 2250) and the Rainman control box (MTEC 2280)",
         ]
       },
       {
@@ -826,28 +847,28 @@ var ALL_CLUSTERS = [
         bullets: [
           "Researching depth sensing cameras and spatial capture as part of computer vision R&D at NYCCT",
           "Exploring LiDAR and depth sensor integration for camera-based interactive installation work",
-          "Point cloud visualization concepts applied to personal portfolio website work page design",
-          "Depth sensing is a listed skill on Creative Technology resume — active area of independent R&D",
+          "Built the camera integration pipeline for You Are Prepared using LiDAR and depth-sensing cameras",
+          "Researching depth sensing and spatial capture as part of the Digitization of Live Theater project",
         ]
       },
       {
         t: "Object Tracking",
         summary: "Computer vision and real-time object recognition for interactive systems.",
         bullets: [
-          "Active R&D in computer vision at NYCCT — exploring machine perception, camera-based interaction, AI-assisted environments",
-          "Researching object tracking for use in live performance contexts — bodies, props, and spatial triggers",
+          "Active R&D in computer vision at NYCCT, exploring machine perception, camera-based interaction, AI-assisted environments",
+          "Researching object tracking for use in live performance contexts, bodies, props, and spatial triggers",
           "Interactive Dance Video Display concept relies on real-time movement tracking to generate live visuals and music",
-          "Computer vision listed as a core skill; active research area with prototyping work ongoing",
+          "Staged Julius Caesar with Google MediaPipe body tracking, so the performers' bodies drive the media around them",
         ]
       },
       {
         t: "HTML / CSS",
         summary: "Front-end web development and interactive interface design.",
         bullets: [
-          "Built personal portfolio website using HTML/CSS — deployed on GitHub Pages",
+          "Built personal portfolio website using HTML/CSS, deployed on GitHub Pages",
           "Designed information architecture and front-end structure for portfolio and project pages",
           "Developed Theater LIVE! platform architecture including full website page specifications for company-side and viewer-side interfaces",
-          "Designed Civic Pulse platform UI — feed layout, poll interface, data export views, and bias labeling system",
+          "Designed Civic Pulse platform UI, feed layout, poll interface, data export views, and bias labeling system",
         ]
       },
       {
@@ -865,7 +886,7 @@ var ALL_CLUSTERS = [
         summary: "Interactive web development and creative coding.",
         bullets: [
           "Planned React-based front-end for personal portfolio including procedural Bezier curve generative background system",
-          "Designed Civic Pulse as a web-based platform — JavaScript underpins the feed, polling, and data export interfaces",
+          "Designed Civic Pulse as a web-based platform, JavaScript underpins the feed, polling, and data export interfaces",
           "Applied JavaScript concepts in front-end architecture for portfolio and platform design projects",
           "Exploring generative and algorithmic visual systems in JavaScript for portfolio work page",
         ]
@@ -878,30 +899,128 @@ var ALL_CLUSTERS = [
    PORTFOLIO PROJECT DATA
    TO CUSTOMIZE:
    - title: project name
-   - category: Film / Theater / Creative Technology
-   - description: short paragraph about the project
-   - imageCount: how many placeholder slots in the lightbox
-   Replace lorem ipsum descriptions with real text when ready.
+   - category: Creative Technology / Theater / Film / Audio / Games
+   - description: one or two sentences, shown on the tile
+   - details: the longer paragraph shown in the popup
+   - media: images ({ src, caption }), video ({ video, poster }) or an
+     embedded player ({ embed, height });
+     the first one is the tile thumbnail. Files live in
+     assets/images/work/ and assets/video/.
+   - links (optional): [{ label, href }] shown in the popup
 ============================================================ */
 var ALL_PROJECTS = [
-  { title: "Untitled Installation 01",    category: "Creative Technology", imageCount: 3,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim." },
-  { title: "Untitled Installation 02",         category: "Film",                imageCount: 4,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut labore et dolore magna aliqua, ut enim ad minim veniam quis nostrud exercitation." },
-  { title: "Untitled Installation 03",       category: "Theater",             imageCount: 2,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute." },
-  { title: "Untitled Installation 04",  category: "Creative Technology", imageCount: 5,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore." },
-  { title: "Untitled Installation 05",           category: "Film",                imageCount: 3,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt." },
-  { title: "Untitled Installation 06",     category: "Creative Technology", imageCount: 4,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Deserunt mollit anim id est laborum. Ut enim ad minim veniam quis nostrud." },
-  { title: "Untitled Installation 07",        category: "Theater",             imageCount: 2,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium." },
-  { title: "Untitled Installation 08",          category: "Film",                imageCount: 3,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit." },
-  { title: "Untitled Installation 09",     category: "Creative Technology", imageCount: 2,
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam." },
+  { title: "The Self-Aware Room", category: "Creative Technology",
+    description: "A projection-mapped room that responds to the people inside it. CHI Research Fellowship, City Tech, 2026.",
+    details: "A projection-mapped room that responds to the people inside it, built for the CHI Research Fellowship at City Tech and supervised by Dr. David B. Smith. Body tracking in Python and OpenCV (Presley Falkenberg) and a Semantic Engine that chooses assets (Sunima) feed my TouchDesigner network over OSC; I map the output onto the room with KantanMapper. Isaiah handles integration testing.",
+    media: [
+      { src: "assets/images/work/sar-moth.jpg",  caption: "My TouchDesigner network for the room." },
+      { src: "assets/images/work/sar-river.jpg", caption: "A generative scene, ready to map." },
+    ] },
+
+  { title: "EasyCaption", category: "Creative Technology",
+    description: "A browser-based captioning and teleprompter tool I designed and built for accessible performances at The Public Theater.",
+    details: "The Public needed a simple way to caption accessible performances, so I built one. The operator can revise text live during a show, the audience gets full-screen captions, and it runs offline. Captioning was on the future-work list of my 2024 research paper; this is where it ended up. Also in progress: LightDraft, a lighting documentation tool, and StageOS, a show control dashboard.",
+    media: [
+      { src: "assets/images/work/easycaption-program.jpg", caption: "The operator's view." },
+      { src: "assets/images/work/easycaption-display.jpg", caption: "What the audience sees." },
+      { src: "assets/images/work/easycaption-landing.jpg", caption: "The start screen." },
+    ] },
+
+  { title: "Peephole and Rainman", category: "Creative Technology",
+    description: "A display shaped like a door peephole, built by hand and then rebuilt as an interactive piece. MTEC 2250 and MTEC 2280.",
+    details: "Peephole began during the pandemic: a display shaped like a door peephole, so the viewer feels they are looking out into a different world. I went from sketches to chipboard to CAD to 3D prints, then rebuilt it after a failed print (MTEC 2250, 2024). It came back as Rainman (MTEC 2280, 2025): two knobs on an ESP32 set the temperature of a stickman's shower, and a particle system changes with it.",
+    media: [
+      { src: "assets/images/work/peephole-chipboard.jpg", caption: "Chipboard prototype." },
+      { src: "assets/images/work/peephole-print.jpg",     caption: "Printed, with a fisheye lens." },
+      { src: "assets/images/work/peephole-cad.jpg",       caption: "Modeled for 3D printing." },
+      { src: "assets/images/work/peephole-demo.jpg",      caption: "Demoed and tweaked." },
+      { src: "assets/images/work/rainman-view.jpg",       caption: "Rainman: the view through the peephole." },
+      { src: "assets/images/work/rainman-box.jpg",        caption: "Rainman: the printed control box." },
+    ] },
+
+  { title: "Did You Eat?", category: "Theater",
+    description: "The Public Theater, 2025. Video technician.",
+    details: "Video technician at The Public Theater. The projections carried the translated Korean dialogue, so the video system was part of how the audience followed the play.",
+    media: [
+      { src: "assets/images/work/didyoueat-1.jpg", caption: "Photo: Emma Zordan." },
+      { src: "assets/images/work/didyoueat-2.jpg", caption: "Photo: Emma Zordan." },
+    ] },
+
+  { title: "My Joy Is Heavy", category: "Theater",
+    description: "New York Theatre Workshop, 2026. Video crew.",
+    details: "Video crew at New York Theatre Workshop.",
+    media: [
+      { src: "assets/images/work/myjoy-1.jpg", caption: "Photo: Marc J. Franklin." },
+      { src: "assets/images/work/myjoy-2.jpg", caption: "Photo: Marc J. Franklin." },
+    ] },
+
+  { title: "Circle Jerk", category: "Theater",
+    description: "Fake Friends at The Connelly Theater, 2021. Assistant video engineer.",
+    details: "I started on this show as a theater electrician and was moved up to assistant video engineer two days into load-in. I worked on the camera systems and video routing for the hybrid livestream, and helped design the camera rig.",
+    media: [
+      { src: "assets/images/work/circlejerk-1.jpg", caption: "Photo: Emilio Madrid." },
+      { src: "assets/images/work/circlejerk-2.jpg", caption: "Photo: Emilio Madrid." },
+    ] },
+
+  { title: "A Real Boy", category: "Theater",
+    description: "Ivy Theatre Company at 59E59, 2017. Assistant stage manager, set build, puppet care.",
+    details: "Assistant stage manager at 59E59 Theaters. I also helped build the set and maintained the marionettes through the run.",
+    media: [
+      { src: "assets/images/work/arealboy-1.jpg", caption: "Photo: Heidi Bohnenkamp." },
+      { src: "assets/images/work/arealboy-2.jpg", caption: "Photo: Heidi Bohnenkamp." },
+    ] },
+
+  { title: "A Full Lighting Plot", category: "Theater",
+    description: "67 fixtures, eight types. Drafted in Vectorworks, with paperwork in Lightwright and a patch for an ETC Eos. ENT 1250, 2026.",
+    details: "My final for Lighting Technology at City Tech: front of house and three electrics, drafted in Vectorworks, with paperwork in Lightwright and a patch built for an ETC Eos console. Moving lights (Martin ERA 300s, Robe MegaPointes and Spiiders, Vari-Lites) alongside ETC Source Four LEDs and Halcyons. The point is that I can take a design from drafting to paperwork to a console.",
+    media: [
+      { src: "assets/images/work/lighting-plot.jpg", caption: "The plot, in Vectorworks." },
+    ] },
+
+  { title: "Cobble Hill, after dark", category: "Film",
+    description: "A one-minute mood piece walking through Cobble Hill, Brooklyn, at night. Shot and cut by me, 2026.",
+    details: "Storefronts, bars, a flower stand and the quiet blocks between them. I shot and cut it myself; it's the clearest example of how I see a place, and the same eye I bring to designing a room.",
+    media: [
+      { video: "assets/video/cobble-hill-after-dark.mp4", poster: "assets/images/work/cobble-2.jpg" },
+      { src: "assets/images/work/cobble-1.jpg" },
+      { src: "assets/images/work/cobble-3.jpg" },
+    ] },
+
+  { title: "From the Edit", category: "Film",
+    description: "Four years as a video editor and DIT at MCM Creative, 2019 to 2023, from GRIT BXNG workout videos to The Moth Project.",
+    details: "Four years of editing is where I learned pacing and story. Work includes Johnson & Johnson's Live Healthy, Live Well (assistant editor, 2020) and The Moth Project, a mini-documentary on composer Peter Kiesewalter (primary editor, 2022). One of my first jobs in the city was GRIT BXNG, a boxing studio in Union Square: I was one of three editors cutting more than 100 of the workout videos people trained to in class, all built on a custom template (2019). Other clients include Dove, Mount Sinai Hospital, Schulte Roth & Zabel, the Princess Grace Foundation and Next Big Idea Club.",
+    media: [
+      { src: "assets/images/work/moth-peter.jpg", caption: "The Moth Project, 2022." },
+      { src: "assets/images/work/moth-intro.jpg", caption: "The Moth Project, 2022." },
+      { src: "assets/images/work/jj-story.jpg",   caption: "Johnson & Johnson, Live Healthy, Live Well, 2020." },
+    ] },
+
+  { title: "The Dan Fogler 4DXperience", category: "Audio",
+    description: "Producer and audio editor on Dan Fogler's podcast, including S8, Episode 6 with Max Brooks, 2023.",
+    details: "I produced The Dan Fogler 4DXperience, Dan Fogler's podcast for people who love movies: I edited and balanced each episode's audio and distributed the show through Megaphone. Give the Max Brooks episode a listen: S8, Episode 6, Facing Future Fears, where the author of World War Z talks about his new Minecraft book.",
+    links: [ { label: "Listen on Apple Podcasts", href: "https://podcasts.apple.com/us/podcast/s8-episode-6-facing-future-fears-with-max-brooks/id1145191833?i=1000635555650" } ],
+    media: [
+      { embed: "https://embed.podcasts.apple.com/us/podcast/s8-episode-6-facing-future-fears-with-max-brooks/id1145191833?i=1000635555650&theme=dark", height: 175,
+        caption: "S8, Episode 6: Facing Future Fears with Max Brooks." },
+      { src: "assets/images/work/4dx-artwork.jpg", caption: "Show artwork by Randy Martinez.", small: true },
+    ] },
+
+  { title: "LOOM", category: "Games",
+    description: "A classless, modular tabletop RPG. Designer and writer, Panacea Gaming Collective. Beta 1.0, 2025.",
+    details: "A classless, modular tabletop RPG with a core ruleset plus Flux, Spellweaver and Hero modules. I designed and wrote it with the Panacea Gaming Collective. Games are where my interest in player agency comes from; I've run campaigns as a Dungeon Master for more than ten years.",
+    media: [
+      { src: "assets/images/work/loom-sheet.jpg", caption: "The LOOM character sheet." },
+    ] },
+
+  { title: "Video Games", category: "Games",
+    description: "Eight browser games in Unity and Twine on itch.io, plus The Jester's Court, a 2D platformer in Godot.",
+    details: "Browser games made in Unity and Twine, including Ratfish, Slip and Grip, Void Game, Grapplonaut and The Grotto. I'm also creative director on The Jester's Court, a 2D hack-and-slash platformer in Godot, with an art department.",
+    links: [ { label: "Play them on itch.io", href: "https://ubiquitousgabriel.itch.io" } ],
+    media: [
+      { src: "assets/images/work/slipgrip.jpg", caption: "Slip and Grip." },
+      { src: "assets/images/work/voidgame.jpg", caption: "Void Game." },
+      { src: "assets/images/work/ratfish.jpg",  caption: "Ratfish." },
+    ] },
 ];
 
 /* ============================================================
@@ -1596,6 +1715,16 @@ function makePlaceholderSVG() {
     '</svg>';
 }
 
+/* First image of a project, or the X placeholder if it has none */
+function makeThumbnail(projectData) {
+  var media = projectData.media || [];
+  for (var m = 0; m < media.length; m++) {
+    var still = media[m].src || media[m].poster;
+    if (still) return '<img src="' + still + '" alt="" loading="lazy" />';
+  }
+  return makePlaceholderSVG();
+}
+
 function buildPortfolioPage() {
   if (portfolioIsBuilt) return;
   portfolioIsBuilt = true;
@@ -1609,16 +1738,16 @@ function buildPortfolioPage() {
       tile.className = 'project-tile';
 
       tile.innerHTML =
-        /* Thumbnail — overflow:hidden clips the image only */
+        /* Thumbnail, overflow:hidden clips the image only */
         '<div class="project-thumbnail-wrapper">' +
-          '<div class="project-thumbnail">' + makePlaceholderSVG() + '</div>' +
+          '<div class="project-thumbnail">' + makeThumbnail(projectData) + '</div>' +
         '</div>' +
-        /* Resting strip — visible at rest, fades on hover */
+        /* Resting strip, visible at rest, fades on hover */
         '<div class="project-resting-strip">' +
           '<p class="resting-strip-category">' + projectData.category + '</p>' +
           '<p class="resting-strip-title">'    + projectData.title    + '</p>' +
         '</div>' +
-        /* Info panel — hidden at rest, expands on hover */
+        /* Info panel, hidden at rest, expands on hover */
         '<div class="project-info-panel">' +
           '<div class="project-info-inner">' +
             '<p class="project-info-category">'    + projectData.category    + '</p>' +
@@ -1665,23 +1794,77 @@ function buildPortfolioPage() {
 function openLightbox(projectData) {
   document.getElementById('lightbox-category').textContent    = projectData.category;
   document.getElementById('lightbox-title').textContent       = projectData.title;
-  document.getElementById('lightbox-description').textContent = projectData.description;
+  document.getElementById('lightbox-description').textContent = projectData.details || projectData.description;
+
+  var links = document.getElementById('lightbox-links');
+  links.innerHTML = '';
+  (projectData.links || []).forEach(function (link) {
+    var a = document.createElement('a');
+    a.href = link.href; a.target = '_blank'; a.rel = 'noopener';
+    a.textContent = link.label;
+    links.appendChild(a);
+  });
 
   var imageGrid = document.getElementById('lightbox-image-grid');
   imageGrid.innerHTML = '';
-  var imageCount = projectData.imageCount || 2;
-  for (var i = 0; i < imageCount; i++) {
-    var slot = document.createElement('div');
-    slot.className = 'lightbox-image-slot';
-    slot.innerHTML = makePlaceholderSVG();
-    imageGrid.appendChild(slot);
+  var media = projectData.media || [];
+  if (!media.length) {
+    for (var p = 0; p < 2; p++) {
+      var empty = document.createElement('div');
+      empty.className = 'lightbox-image-slot';
+      empty.innerHTML = makePlaceholderSVG();
+      imageGrid.appendChild(empty);
+    }
   }
+  var halfCount = 0, lastHalf = -1;
+  media.forEach(function (item, i) {
+    if (!item.video && !item.embed && !item.wide) { halfCount++; lastHalf = i; }
+  });
+  media.forEach(function (item, index) {
+    var slot = document.createElement('figure');
+    slot.className = 'lightbox-image-slot has-media';
+    /* Video, a lone image, or an odd last half-width image spans both columns */
+    if (item.video || item.embed || item.wide || halfCount === 1 ||
+        (index === lastHalf && halfCount % 2 === 1)) {
+      slot.classList.add('is-wide');
+    }
+    if (item.small) slot.classList.add('is-small');
+    var el;
+    if (item.embed) {
+      el = document.createElement('iframe');
+      el.src = item.embed;
+      el.className = 'lightbox-embed';
+      el.style.height = (item.height || 175) + 'px';
+      el.setAttribute('allow', 'autoplay *; encrypted-media *; fullscreen *; clipboard-write');
+      el.setAttribute('sandbox', 'allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation');
+      el.setAttribute('title', item.caption || projectData.title);
+      el.loading = 'lazy';
+    } else if (item.video) {
+      el = document.createElement('video');
+      el.src = item.video; el.poster = item.poster || '';
+      el.controls = true; el.playsInline = true; el.preload = 'none';
+    } else {
+      el = document.createElement('img');
+      el.src = item.src; el.alt = item.caption || projectData.title; el.loading = 'lazy';
+    }
+    slot.appendChild(el);
+    if (item.caption) {
+      var cap = document.createElement('figcaption');
+      cap.className = 'lightbox-image-caption';
+      cap.textContent = item.caption;
+      slot.appendChild(cap);
+    }
+    imageGrid.appendChild(slot);
+  });
 
   document.getElementById('lightbox-overlay').classList.add('is-open');
   document.body.style.overflow = 'hidden';
 }
 
 function closeLightbox() {
+  /* Stop any video that was playing */
+  var vids = document.querySelectorAll('#lightbox-image-grid video');
+  for (var v = 0; v < vids.length; v++) vids[v].pause();
   document.getElementById('lightbox-overlay').classList.remove('is-open');
   document.body.style.overflow = '';
 }
